@@ -3,6 +3,7 @@
 
 const express = require('express');
 const cookieParser = require('cookie-parser');
+const mongoose = require('mongoose');
 
 // initialize base of express app
 const app = express();
@@ -11,6 +12,15 @@ app.use(express.json());
 app.use(cookieParser());
 
 // "type": "module",
+
+// mongodb+srv://Carter:weBHook34^5@redditclonecartier.8eovm.mongodb.net/?retryWrites=true&w=majority&appName=RedditCloneCartier
+//mongo connection
+mongoose
+.connect('mongodb+srv://Carter:weBHook34^5@redditclonecartier.8eovm.mongodb.net/?retryWrites=true&w=majority&appName=RedditCloneCartier')
+.then(() => { console.log('connected to mongo DB for Reddit clone !');
+})
+.catch((err) => {console.log('Error:',err);
+});
 
 
 // Routes
