@@ -1,8 +1,6 @@
-// import { Mongoose } from "mongoose";
 
 // Require the mongoose module 
-const mongoose = require('mongoose'); 
-const Schema = mongoose.Schema;
+import mongoose from 'mongoose';
 
 const userSchemaObject = {
     username: {
@@ -21,9 +19,11 @@ const userSchemaObject = {
       }
 }
 
-const mongooseSchema = mongoose.Schema(userSchemaObject);
+const userSchema = mongoose.Schema(userSchemaObject);
 
-module.exports = mongoose.model('User',mongooseSchema);
+const User = mongoose.model('User',userSchema);
+
+export {User, userSchema}
   
 // Defining User model 
 // export const User = mongoose.model('User', userSchema);
