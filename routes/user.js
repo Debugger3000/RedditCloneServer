@@ -1,21 +1,23 @@
+import express from 'express';
 
-
-// const User = require('../models/user');
-// const passport = require('passport');
-const express = require('express');
-// const encrypt = require('bcryptjs');
 //main router to 
 const router = express.Router();
 
-
-// test route
-router.get('/', (req,res) => {
-
-    console.log("GET for /api/user has been called !")
-    res.status(200).send({message: "Here is your data !"});
-});
+// import controller functions
+import { usersGet, userLogin, userRegister, userLogout } from '../controllers/users.js';
 
 
-module.exports = router;
+// routes for /user to hit
+router.get('/', usersGet);
+
+
+router.post('/login', userLogin);
+router.post('/register', userRegister);
+router.post('/logout', userLogout);
+
+
+
+export default router;
+// module.exports = router;
 
 

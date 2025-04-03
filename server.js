@@ -1,35 +1,91 @@
-// import express from "express";
-// import userRoute from './routes/user.js';
+// -------------------------
+// general server imports
+import express from 'express';
+import cookieParser from 'cookie-parser';
+import mongoose from 'mongoose';
+import expressSession from 'express-session';
+import connectMongo from 'connect-mongo';
+import dotenv from 'dotenv';
 
-const express = require('express');
-const cookieParser = require('cookie-parser');
-const mongoose = require('mongoose');
+import passport from './middleware/Authentication.js';
+
+// Routes import
+import userRouter from './routes/user.js';
+
+
+// -----------------
+// Set environment files based on script start
+dotenv.config({path: `./.env.${process.env.NODE_ENV}`});
+// log out environment type
+console.log("Environment: ",process.env.NODE_ENV);
+
+
+// general variables
+const port = 8080;
 
 // initialize base of express app
 const app = express();
-// some middle ware
+
+
+// some middle ware for app to use
 app.use(express.json());
 app.use(cookieParser());
 
-// "type": "module",
+// Sessions
+const sessionObject = {
+    store: connectMongo.create({
+        mongoUrl: `${process.env.MONGO_CONNECTION}`,
+        touchAfter: 24 * 3600, // update session when touched only once every 24 hours
+        collectionName: 'RedditCloneSessions',
+    }),
+    name: 'RedditCloneCookie',
+    secret: 'fakeSecret',
+    saveUninitialized: false,
+    resave: false,
 
+    cookie: {
+        maxAge: 60000
+    }
+}
+app.use(expressSession(sessionObject));
+
+
+app.use(passport.initialize());
+// 
+app.use(passport.session());
+
+passport.serializeUser((user,done) => {
+  console.log("Serializing");
+  done(null,user);
+});
+
+passport.deserializeUser((user,done) => {
+  console.log('Deserializing');
+  done(null,user);
+})
+
+
+
+
+
+
+// MONGO DB connection...
 // mongodb+srv://Carter:weBHook34^5@redditclonecartier.8eovm.mongodb.net/?retryWrites=true&w=majority&appName=RedditCloneCartier
 //mongo connection
 mongoose
-.connect('mongodb+srv://Carter:weBHook34^5@redditclonecartier.8eovm.mongodb.net/?retryWrites=true&w=majority&appName=RedditCloneCartier')
-.then(() => { console.log('connected to mongo DB for Reddit clone !');
-})
-.catch((err) => {console.log('Error:',err);
-});
+.connect(process.env.MONGO_CONNECTION)
+.then(() => { console.log('connected to mongo DB for Reddit clone !');})
+.catch((err) => {console.log('Error:',err);});
 
 
 // Routes
-app.use('/api/user', require('./routes/user'));
+app.use('/api/user', userRouter);
 
 
-// listen to port
-const port = 8080;
+// listen to a port
 app.listen(port, () => {
-    console.log("Server Started");
     console.log("Listening on port 8080");
 });
+
+
+export { passport }
