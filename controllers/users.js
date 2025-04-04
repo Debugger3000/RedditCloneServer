@@ -125,7 +125,21 @@ const userLogin = function (req,res,next) {
 
 
 
+const isAuthenticated = (req, res) => {
+    try{
+        if(req.user) {
+            res.status(200).json({status: true});
+        }
+        else{
+            res.status(500).json({status: false});
+        }
+    }
+    catch(error){
+        console.log("Error in Authentication: ", error);
+        res.status(500).json({status: false});
+    }
 
+}
 
 
 
@@ -142,4 +156,4 @@ const userLogin = function (req,res,next) {
 
 // ---------------------------
 
-export { usersGet, userLogin, userRegister, userLogout }
+export { usersGet, userLogin, userRegister, userLogout, isAuthenticated }
