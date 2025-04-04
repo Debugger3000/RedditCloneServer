@@ -127,10 +127,13 @@ const userLogin = function (req,res,next) {
 
 const isAuthenticated = (req, res) => {
     try{
+        console.log("Checking user auth has been hit");
         if(req.user) {
+            console.log("User auth status: Good");
             res.status(200).json({status: true});
         }
         else{
+            console.log("User auth status: Bad");
             res.status(500).json({status: false});
         }
     }
