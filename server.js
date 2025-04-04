@@ -35,7 +35,7 @@ app.use(cookieParser());
 const sessionObject = {
     store: connectMongo.create({
         mongoUrl: `${process.env.MONGO_CONNECTION}`,
-        touchAfter: 24 * 3600, // update session when touched only once every 24 hours
+        //touchAfter: 24 * 3600, // update session when touched only once every 24 hours
         collectionName: 'RedditCloneSessions',
     }),
     name: 'RedditCloneCookie',
