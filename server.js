@@ -11,6 +11,7 @@ import passport from './middleware/Authentication.js';
 
 // Routes import
 import userRouter from './routes/user.js';
+import threadRouter from './routes/threads.js';
 
 
 // -----------------
@@ -80,7 +81,7 @@ mongoose
 
 // Routes
 app.use('/api/user', userRouter);
-
+app.use('/api/thread', threadRouter);
 
 // listen to a port
 app.listen(port, () => {
