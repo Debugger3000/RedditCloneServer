@@ -21,7 +21,7 @@ const threadSchemaObject = {
     },
     // links that the thread has to other platforms (youtube, twitch....)
     links: {
-        type: String
+        type: [String]
     },
 
     // Users who exist within the thread

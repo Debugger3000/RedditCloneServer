@@ -11,7 +11,11 @@ const postSchemaObject = {
         type: String,
         required: true
     },
-
+    parentThread: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Thread', 
+        required: true
+    },
     image: {
         type: Number
     },

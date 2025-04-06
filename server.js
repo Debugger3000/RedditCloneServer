@@ -45,7 +45,7 @@ const sessionObject = {
     resave: false,
 
     cookie: {
-        maxAge: 60000
+        maxAge: 3600000
     }
 }
 app.use(expressSession(sessionObject));
