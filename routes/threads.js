@@ -4,10 +4,14 @@ import express from 'express';
 const router = express.Router();
 
 // import controller functions
-import { createThread } from '../controllers/threads.js';
+import { createThread, getThreads, getThread, getThreadByTitle } from '../controllers/threads.js';
 
 // Post a new thread to collection
-router.post('/threads', createThread);
+router.post('/', createThread);
 
+
+router.get('/', getThreads);
+router.get('/:id', getThread);
+router.get('/search/:title', getThreadByTitle);
 
 export default router;
