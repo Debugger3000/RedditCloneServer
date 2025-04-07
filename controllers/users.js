@@ -19,6 +19,19 @@ const usersGet = async (req,res) => {
     }
 }
 
+const userGet = async (req,res) => {
+    console.log("userGet route /api/user has been hit");
+    try{
+        // grab all users
+        const user = await User.findById(req.params.id);
+        res.status(200).json(user);
+    }
+    catch (error) {
+        console.log("Error in userGet: ", error);
+        res.status(500).json({message: "Error in userGet controller"});
+    }
+}
+
 
 // Logout 
 const userLogout = (req, res) => {
@@ -111,7 +124,7 @@ const userLogin = function (req,res,next) {
                     req.login(user, async (error) => {
                         console.log("User logged in !");
                         console.log('Is User Authenticated: ', req.isAuthenticated());
-                        res.status(200).json({status: true});
+                        res.status(200).json({status: true, username: user.username, _id: user._id});
                     });
                 }
             }
@@ -159,4 +172,4 @@ const isAuthenticated = (req, res) => {
 
 // ---------------------------
 
-export { usersGet, userLogin, userRegister, userLogout, isAuthenticated }
+export { usersGet, userLogin, userRegister, userLogout, isAuthenticated, userGet }
