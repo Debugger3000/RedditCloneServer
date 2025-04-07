@@ -4,11 +4,12 @@ import express from 'express';
 const router = express.Router();
 
 // import controller functions
-import { usersGet, userLogin, userRegister, userLogout, isAuthenticated } from '../controllers/users.js';
+import { usersGet, userLogin, userRegister, userLogout, isAuthenticated, userGet } from '../controllers/users.js';
 
 
 // routes for /user to hit
 router.get('/', usersGet);
+router.get('/:id', userGet);
 
 
 router.post('/login', userLogin);

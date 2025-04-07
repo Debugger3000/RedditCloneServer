@@ -4,11 +4,12 @@ import { Thread } from "../models/threads.js";
 const createThread = async (req,res) => {
     console.log("Create thread route hit");
     try{
-        const {title, bio, links} = req.body;
+        const {title, bio, links, tags} = req.body;
         const thread = new Thread({
             title: title,
             bio: bio,
             links: links,
+            tags: tags,
             followers: [req.user._id],
             followersCount: 1
         });
@@ -58,6 +59,39 @@ const getThreadByTitle = async (req,res) => {
     }
 }
 
+const joinThread = async (req,res) => {
+    console.log("Join thread route hit");
+    try{
+        // find a thread
+        const thread = await Thread.findById(req.params.id);
 
-export { createThread, getThreads, getThread, getThreadByTitle }
+        // mutate thread object, add req.user._id
+        if (!thread.followers.includes(req.user._id)) {
+            thread.followers.push(req.user._id); 
+        }
+        // if aleady joined then you can remove them...
+        else {
+            console.log("followers before slice: ", thread.followers);
+            const index = thread.followers.indexOf(req.user._id);
+            console.log("index grabbed is: ", index);
+            thread.followers.splice(index, 1);
+            console.log("slice performned...");
+            console.log("followers after slice: ", thread.followers);
+        }
+
+        await thread.save();
+
+        res.status(200).json(thread);
+    }
+    catch (error) {
+        console.log("Error in join thread: ", error);
+        res.status(500).json({message: "Error in join thread controller"});
+    }
+
+}
+
+
+
+
+export { createThread, getThreads, getThread, getThreadByTitle, joinThread }
 

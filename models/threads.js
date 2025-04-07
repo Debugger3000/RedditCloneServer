@@ -5,7 +5,7 @@ import mongoose from 'mongoose';
 
 
 // sub reddit
-const threadSchemaObject = {
+const threadSchemaObject = new mongoose.Schema({
     title: {
         type: String,
         required: true,
@@ -23,6 +23,11 @@ const threadSchemaObject = {
     links: {
         type: [String]
     },
+
+    // tags that posts tag their post with 
+    tags: [{
+        type: String
+    }],
 
     // Users who exist within the thread
     followers: [{
@@ -42,10 +47,9 @@ const threadSchemaObject = {
         type: Number
     }
 
-}
+}, {timestamps: true });
 
-const threadSchema = mongoose.Schema(threadSchemaObject);
 
-const Thread = mongoose.model('Thread',threadSchema);
+const Thread = mongoose.model('Thread',threadSchemaObject);
 
-export {Thread, threadSchema}
+export {Thread}
