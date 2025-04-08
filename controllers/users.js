@@ -145,19 +145,49 @@ const isAuthenticated = (req, res) => {
         console.log("Checking user auth has been hit");
         if(req.user) {
             console.log("User auth status: Good");
-            res.status(200).json({status: true});
+            console.log("user object: ",req.user);
+            console.log("user object: ",req.user._id);
+            res.status(200).json({status: true, userId: req.user._id, username: req.user.username});
         }
         else{
             console.log("User auth status: Bad");
-            res.status(500).json({status: false});
+            res.status(500).json({status: false, userId: null, username: null});
         }
     }
     catch(error){
         console.log("Error in Authentication: ", error);
-        res.status(500).json({status: false});
+        res.status(500).json({status: false, userId: null, username: null});
     }
 
 }
+
+
+
+// Github authentication....
+
+// const githubAuthenticateCallback = (req,res) => {
+//     passport.authenticate('github', { failureRedirect: '/login' }),
+//     // if successful this gets called...
+//     function(req, res) {
+//       // Successful authentication, redirect home.
+//       console.log("github authentication has been successful...");
+//       res.redirect('/home');
+//     };
+
+// }
+
+// const githubAuthenticate = (req,res) => {
+//     console.log("first github route hit, /auth/github");
+//     passport.authenticate('github');
+// }
+
+// app.get('/auth/github/callback', 
+//     passport.authenticate('github', { failureRedirect: '/login' }),
+//     function(req, res) {
+//       // Successful authentication, redirect home.
+//       console.log("github authentication has been successful...");
+//       res.redirect('http://localhost:4200/home');
+//     });
 
 
 
