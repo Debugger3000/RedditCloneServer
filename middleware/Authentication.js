@@ -14,7 +14,7 @@ dotenv.config({path: `./.env.${process.env.NODE_ENV}`});
 console.log("middle ware file has run...");
 
 console.log("clientId: ", process.env.GITHUB_CLIENT_ID);
-console.log("clientSecret: ", process.env.GITHUB_CLIENT_SECRET);
+console.log("CALLBACK: ", process.env.GITHUB_CALLBACK);
 
 
 
@@ -24,7 +24,7 @@ passport.use(
   new GitHubStrategy.Strategy({
     clientID: process.env.GITHUB_CLIENT_ID,
     clientSecret: process.env.GITHUB_CLIENT_SECRET,
-    callbackURL: "http://localhost:4200/api/user/auth/github/callback",
+    callbackURL: process.env.GITHUB_CALLBACK,
     scope: ['user:email']
   },
   async function(accessToken, refreshToken, profile, cb) {
