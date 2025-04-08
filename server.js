@@ -6,6 +6,7 @@ import mongoose from 'mongoose';
 import expressSession from 'express-session';
 import connectMongo from 'connect-mongo';
 import dotenv from 'dotenv';
+import cors from 'cors';
 
 import passport from './middleware/Authentication.js';
 
@@ -13,6 +14,8 @@ import passport from './middleware/Authentication.js';
 import userRouter from './routes/user.js';
 import threadRouter from './routes/threads.js';
 import postRouter from './routes/post.js';
+
+// github
 
 
 // -----------------
@@ -32,6 +35,13 @@ const app = express();
 // some middle ware for app to use
 app.use(express.json());
 app.use(cookieParser());
+app.use(cors(
+  {
+    origin: true,
+    credentials: true
+
+  }
+));
 
 // Sessions
 const sessionObject = {
@@ -41,12 +51,14 @@ const sessionObject = {
         collectionName: 'RedditCloneSessions',
     }),
     name: 'RedditCloneCookie',
+    
     secret: 'fakeSecret',
     saveUninitialized: false,
     resave: false,
 
     cookie: {
-        maxAge: 3600000
+      httpOnly: false,
+      maxAge: 3600000
     }
 }
 app.use(expressSession(sessionObject));
@@ -55,6 +67,12 @@ app.use(expressSession(sessionObject));
 app.use(passport.initialize());
 // 
 app.use(passport.session());
+
+
+
+
+
+
 
 passport.serializeUser((user,done) => {
   console.log("Serializing");
@@ -84,6 +102,7 @@ mongoose
 app.use('/api/user', userRouter);
 app.use('/api/thread', threadRouter);
 app.use('/api/post', postRouter);
+// app.use('/auth', githubRouter);
 
 // listen to a port
 app.listen(port, () => {
