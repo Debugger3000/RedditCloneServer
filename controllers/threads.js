@@ -4,14 +4,15 @@ import { Thread } from "../models/threads.js";
 const createThread = async (req,res) => {
     console.log("Create thread route hit");
     try{
-        const {title, bio, links, tags} = req.body;
+        const {title, bio, links, tags, username} = req.body;
         const thread = new Thread({
             title: title,
             bio: bio,
             links: links,
             tags: tags,
             followers: [req.user._id],
-            followersCount: 1
+            followersCount: 1,
+            owner: username
         });
         await thread.save();
         res.status(200).json({thread});
@@ -21,6 +22,48 @@ const createThread = async (req,res) => {
         res.status(500).json({message: "Error in create thread controller"});
     }
 }
+
+
+const editThread = async (req,res) => {
+    console.log("Edit thread route hit");
+    try{
+        const {title, bio, links, tags} = req.body;
+
+        const newThread = {
+            title: title,
+            bio: bio,
+             links: links,
+             tags: tags,
+        };
+
+        const thread = await Thread.findByIdAndUpdate(req.params.id, newThread);
+
+        // const thread = new Thread({
+        //     title: title,
+        //     bio: bio,
+        //     links: links,
+        //     tags: tags,
+        //     followers: [req.user._id],
+        //     followersCount: 1,
+        //     owner: req.user._id
+        // });
+        
+        res.status(200).json({thread});
+    }
+    catch (error) {
+        console.log("Error in thread Create: ", error);
+        res.status(500).json({message: "Error in create thread controller"});
+    }
+}
+
+
+
+
+
+
+
+
+
 
 const getThreads = async (req,res) => {
     console.log("Get threads hit...");
@@ -87,11 +130,23 @@ const joinThread = async (req,res) => {
         console.log("Error in join thread: ", error);
         res.status(500).json({message: "Error in join thread controller"});
     }
+}
 
+
+const deleteThread = async (req,res) => {
+    console.log("Delete threads hit...");
+    try{
+        const thread = await Thread.findByIdAndDelete(req.params.id);
+        res.status(200).json(thread);
+    }
+    catch (error) {
+        console.log("Error in thread delete: ", error);
+        res.status(500).json({message: "Error in delete threads controller"});
+    }
 }
 
 
 
 
-export { createThread, getThreads, getThread, getThreadByTitle, joinThread }
+export { createThread, getThreads, getThread, getThreadByTitle, joinThread, deleteThread, editThread }
 

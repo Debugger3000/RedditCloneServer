@@ -29,6 +29,12 @@ const threadSchemaObject = new mongoose.Schema({
         type: String
     }],
 
+    // owner of thread (has edit and delete permsissions)
+    owner: {
+        type: String,
+        required: true
+    },
+
     // Users who exist within the thread
     followers: [{
         type: mongoose.Schema.Types.ObjectId, 

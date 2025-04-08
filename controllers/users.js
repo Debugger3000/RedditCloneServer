@@ -22,8 +22,10 @@ const usersGet = async (req,res) => {
 const userGet = async (req,res) => {
     console.log("userGet route /api/user has been hit");
     try{
+        console.log("id on params.id: ",req.params.id);
         // grab all users
         const user = await User.findById(req.params.id);
+        console.log("user grabbed in userGET: ",user);
         res.status(200).json(user);
     }
     catch (error) {
