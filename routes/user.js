@@ -1,5 +1,10 @@
 import express from 'express';
 import passport from 'passport';
+import dotenv from 'dotenv';
+
+// var GitHubStrategy = require('passport-github').Strategy;
+
+dotenv.config({path: `./.env.${process.env.NODE_ENV}`});
 
 
 //main router to 
@@ -27,7 +32,7 @@ router.get('/auth/github/callback',
           console.log("Current req user from github auth: ", req.user);
 
             // res.redirect(`/home/${req.user._id}`);
-            res.redirect('/home');
+            res.redirect(process.env.GITHUB_REDIRECT);
         }
 );
 router.get('/auth/github',
