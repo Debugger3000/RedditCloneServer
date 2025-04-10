@@ -4,12 +4,13 @@ import { Thread } from "../models/threads.js";
 const createThread = async (req,res) => {
     console.log("Create thread route hit");
     try{
-        const {title, bio, links, tags, username} = req.body;
+        const {title, bio, links, tags, username, threadImage} = req.body;
         const thread = new Thread({
             title: title,
             bio: bio,
             links: links,
             tags: tags,
+            threadImage: threadImage,
             followers: [req.user._id],
             followersCount: 1,
             owner: username
@@ -27,13 +28,14 @@ const createThread = async (req,res) => {
 const editThread = async (req,res) => {
     console.log("Edit thread route hit");
     try{
-        const {title, bio, links, tags} = req.body;
+        const {title, bio, links, tags, threadImage} = req.body;
 
         const newThread = {
             title: title,
             bio: bio,
-             links: links,
-             tags: tags,
+            links: links,
+            tags: tags,
+            threadImage: threadImage
         };
 
         const thread = await Thread.findByIdAndUpdate(req.params.id, newThread);

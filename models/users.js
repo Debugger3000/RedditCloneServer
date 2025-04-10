@@ -16,7 +16,12 @@ const userSchemaObject = {
       password: {
         type: String,
         required: true
-      }
+      },
+    // Main image for user...
+    profileImage: {
+      type: String,
+      default: ''
+    },
 }
 
 const userSchema = mongoose.Schema(userSchemaObject);
