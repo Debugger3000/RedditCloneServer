@@ -26,6 +26,9 @@ const postSchemaObject = new mongoose.Schema({
         ref: 'Thread', 
         required: true
     },
+    parentThreadImage: {
+        type: String
+    },
     image: {
         type: Number
     },

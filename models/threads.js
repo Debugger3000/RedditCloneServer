@@ -13,7 +13,7 @@ const threadSchemaObject = new mongoose.Schema({
 
     // Main image for thread...
     threadImage: {
-        type: Number
+        type: String
     },
 
     bio: {

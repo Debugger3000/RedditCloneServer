@@ -140,14 +140,18 @@ const userLogin = function (req,res,next) {
 
 
 
-const isAuthenticated = (req, res) => {
+const isAuthenticated = async (req, res) => {
     try{
         console.log("Checking user auth has been hit");
         if(req.user) {
             console.log("User auth status: Good");
             console.log("user object: ",req.user);
             console.log("user object: ",req.user._id);
-            res.status(200).json({status: true, userId: req.user._id, username: req.user.username});
+
+            const user = await User.findById(req.user._id);
+
+
+            res.status(200).json({status: true, _id: req.user._id, username: req.user.username, profileImage: user.profileImage});
         }
         else{
             console.log("User auth status: Bad");
@@ -190,6 +194,25 @@ const isAuthenticated = (req, res) => {
 //     });
 
 
+const editProfile = async (req,res) => {
+    console.log("edit profile route /api/user has been hit");
+    try{
+        const { username, profileImage} = req.body;
+        const newUser = {
+            username: username,
+            profileImage: profileImage
+        };
+        const user = await User.findByIdAndUpdate(req.params.id, newUser);
+        
+        res.status(200).json({user});
+    }
+    catch (error) {
+        console.log("Error in usersGet: ", error);
+        res.status(500).json({message: "Error in usersGet controller"});
+    }
+
+}
+
 
 
 
@@ -204,4 +227,4 @@ const isAuthenticated = (req, res) => {
 
 // ---------------------------
 
-export { usersGet, userLogin, userRegister, userLogout, isAuthenticated, userGet }
+export { usersGet, userLogin, userRegister, userLogout, isAuthenticated, userGet, editProfile }

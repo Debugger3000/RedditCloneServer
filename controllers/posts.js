@@ -5,14 +5,15 @@ import { Post } from "../models/posts.js";
 const createPost = async (req,res) => {
     console.log("Create Post route hit");
     try{
-        const {title, textContent, parentThread, tag} = req.body;
+        const {title, textContent, parentThread, tag, parentThreadImage} = req.body;
 
         const post = new Post({
             title: title,
             textContent: textContent,
             parentThread: parentThread,
             user: req.user._id,
-            tag: tag
+            tag: tag,
+            parentThreadImage: parentThreadImage
         });
         await post.save();
         res.status(200).json({post});
