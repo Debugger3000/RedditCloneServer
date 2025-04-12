@@ -56,14 +56,14 @@ const sessionObject = {
     secret: 'fakeSecret',
     saveUninitialized: false,
     resave: false,
-    sameSite: 'none',
-    secure: true,
-    // httpOnly: true,
-    partitioned: true,
+    // sameSite: 'none',
+    // secure: true,
+    // // httpOnly: true,
+    // partitioned: true,
     
 
     cookie: {
-      domain:process.env.ORIGIN,
+      httpOnly: false,
       maxAge: 3600000
     }
 }
