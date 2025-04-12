@@ -55,6 +55,8 @@ const sessionObject = {
     secret: 'fakeSecret',
     saveUninitialized: false,
     resave: false,
+    secure: true,
+    sameSite: 'none',
 
     cookie: {
       httpOnly: false,
