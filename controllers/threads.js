@@ -149,7 +149,6 @@ const deleteThread = async (req,res) => {
 
 const getThreadsByUser = async (req,res) => {
     console.log("get threads for user.....");
-    console.log("POOOOOOPPPP");
     try{
         console.log("USER THREAD OBJ: ",req.user._id);
         const thread = await Thread.find({ followers: { $in: [req.user._id] } });
