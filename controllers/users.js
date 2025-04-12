@@ -25,7 +25,7 @@ const userGet = async (req,res) => {
         console.log("id on params.id: ",req.params.id);
         // grab all users
         const user = await User.findById(req.params.id);
-        console.log("user grabbed in userGET: ",user);
+        // console.log("user grabbed in userGET: ",user);
         res.status(200).json(user);
     }
     catch (error) {
@@ -197,9 +197,8 @@ const isAuthenticated = async (req, res) => {
 const editProfile = async (req,res) => {
     console.log("edit profile route /api/user has been hit");
     try{
-        const { username, profileImage} = req.body;
+        const {profileImage} = req.body;
         const newUser = {
-            username: username,
             profileImage: profileImage
         };
         const user = await User.findByIdAndUpdate(req.params.id, newUser);
