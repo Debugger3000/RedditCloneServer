@@ -147,8 +147,24 @@ const deleteThread = async (req,res) => {
     }
 }
 
+const getThreadsByUser = async (req,res) => {
+    console.log("get threads for user.....");
+    console.log("POOOOOOPPPP");
+    try{
+        console.log("USER THREAD OBJ: ",req.user._id);
+        const thread = await Thread.find({ followers: { $in: [req.user._id] } });
+        res.status(200).json(thread);
+    }
+    catch (error) {
+        console.log("Error in get thread by user: ", error);
+        res.status(500).json({message: "Error in delete threads controller"});
+    }
+
+
+}
 
 
 
-export { createThread, getThreads, getThread, getThreadByTitle, joinThread, deleteThread, editThread }
+
+export { createThread, getThreads, getThread, getThreadByTitle, joinThread, deleteThread, editThread, getThreadsByUser }
 
