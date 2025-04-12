@@ -23,6 +23,7 @@ import postRouter from './routes/post.js';
 dotenv.config({path: `./.env.${process.env.NODE_ENV}`});
 // log out environment type
 console.log("Environment: ",process.env.NODE_ENV);
+console.log("origin: ",process.env.ORIGIN);
 
 
 // general variables
@@ -55,11 +56,14 @@ const sessionObject = {
     secret: 'fakeSecret',
     saveUninitialized: false,
     resave: false,
-    secure: true,
     sameSite: 'none',
+    secure: true,
+    // httpOnly: true,
+    partitioned: true,
+    
 
     cookie: {
-      httpOnly: false,
+      domain:process.env.ORIGIN,
       maxAge: 3600000
     }
 }
