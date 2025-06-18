@@ -14,7 +14,7 @@ import passport from './middleware/Authentication.js';
 import userRouter from './routes/user.js';
 import threadRouter from './routes/threads.js';
 import postRouter from './routes/post.js';
-
+import commentRouter from './routes/comment.js'
 // github
 
 
@@ -108,6 +108,7 @@ mongoose
 app.use('/api/user', userRouter);
 app.use('/api/thread', threadRouter);
 app.use('/api/post', postRouter);
+app.use('/api/comment', commentRouter);
 // app.use('/auth', githubRouter);
 
 // listen to a port

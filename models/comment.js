@@ -1,35 +1,63 @@
 import mongoose from 'mongoose';
 
-
-const commentSchemaObject = {
+const commentSchemaObject = new mongoose.Schema({
     commentText: {
         type: String,
         required: true
     },
 
-    // What this comment is on. Either a thread or a comment
-    // ID of either a User or a Thread
-    parent: {
+    // grab all comments without a parent comment first, and then grab their children
+
+    // id of a parent thread...
+    // allow easy query of all comments pertaining to this thread
+    parentThread: {
         type: String
     },
 
+    // ID of parent comment
+    // null if it has no parent comment
+    parentComment: {
+        type: String,
+        default: null
+    },
+
+    // add child comments to this array
+    childComments: [{
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Comment',
+        default: []
+    }],
+
     // Ref to user whos comment this is
+    // add owner id, pic, username on comment creation
+    // id of user
     owner: {
         type: mongoose.Schema.Types.ObjectId, 
         ref: 'User',
     },
 
-    // children of this comment, people who comment on this comment
-    childrenComments: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'User',
+    // owner Profile Picture
+    ownerPicture: {
+        type: String
     },
 
-    timestamp: true
-}
+    // owner username
+    ownerUserName: {
+        type: String
+    },
 
-const commentSchema = mongoose.Schema(commentSchemaObject);
+    // children of this comment, people who comment on this comment
+    // childrenComments: {
+    //     type: mongoose.Schema.Types.ObjectId,
+    //     ref: 'User',
+    // },
 
-const Comment= mongoose.model('Comment',commentSchema);
+    // calculate difference on front end (6 hrs ago, 2 wks ago, 1 yr ago)
+   
+}, { timestamps: true })
 
-export {Comment, commentSchema}
+// const commentSchema = mongoose.Schema(commentSchemaObject);
+
+const Comment= mongoose.model('Comment',commentSchemaObject);
+
+export {Comment}

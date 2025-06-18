@@ -26,12 +26,24 @@ const postSchemaObject = new mongoose.Schema({
         ref: 'Thread', 
         required: true
     },
+    parentThreadTitle: {
+        type: String
+    },
     parentThreadImage: {
         type: String
     },
     image: {
         type: Number
     },
+    // comment tracker, need a comment count on post card view
+    commentCount: {
+        type: Number
+    },
+    // owner of post (has edit and delete permsissions)
+    owner: {
+        type: String,
+        required: true
+    }
 
 }, { timestamps: true });
 
