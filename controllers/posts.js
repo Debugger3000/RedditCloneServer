@@ -5,15 +5,18 @@ import { Post } from "../models/posts.js";
 const createPost = async (req,res) => {
     console.log("Create Post route hit");
     try{
-        const {title, textContent, parentThread, tag, parentThreadImage} = req.body;
+        const {title, textContent, owner, parentThread, parentThreadTitle, tag, parentThreadImage} = req.body;
 
         const post = new Post({
             title: title,
             textContent: textContent,
             parentThread: parentThread,
+            parentThreadTitle: parentThreadTitle,
             user: req.user._id,
             tag: tag,
-            parentThreadImage: parentThreadImage
+            commentCount: 0,
+            parentThreadImage: parentThreadImage,
+            owner: owner
         });
         await post.save();
         res.status(200).json({post});
@@ -67,5 +70,19 @@ const getPost = async (req,res) => {
 
 }
 
+const deletePost = async (req,res) => {
+console.log("delete post route hit.....................................");
+    try{
+        const post = await Post.findByIdAndDelete(req.params.id);
+        
+        res.status(200).json(post);
+    }
+    catch (error) {
+        console.log("Error in delete POST: ", error);
+        res.status(500).json({message: "Error in delete post controller"});
+    }
 
-export { createPost, getPosts, getPostsForThread, getPost }
+}
+
+
+export { createPost, getPosts, getPostsForThread, getPost, deletePost }
