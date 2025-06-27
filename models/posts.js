@@ -1,54 +1,62 @@
+// Require the mongoose module
+import mongoose from "mongoose";
 
-// Require the mongoose module 
-import mongoose from 'mongoose';
-
-const postSchemaObject = new mongoose.Schema({
+const postSchemaObject = new mongoose.Schema(
+  {
     title: {
-        type: String,
-        required: true
+      type: String,
+      required: true,
     },
     textContent: {
-        type: String,
-        required: true
+      type: String,
+      required: true,
     },
     // Users who exist within the thread
     user: {
-        type: mongoose.Schema.Types.ObjectId, 
-        ref: 'User', 
-        // User who creates the thread will be the first one to be added to the thread...
-        required: true
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User",
+      // User who creates the thread will be the first one to be added to the thread...
+      required: true,
     },
     tag: {
-        type: String
+      type: String,
     },
     parentThread: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'Thread', 
-        required: true
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Thread",
+      required: true,
     },
     parentThreadTitle: {
-        type: String
+      type: String,
     },
     parentThreadImage: {
-        type: String
+      type: String,
     },
     image: {
-        type: Number
+      type: Number,
     },
     // comment tracker, need a comment count on post card view
     commentCount: {
-        type: Number
+      type: Number,
+    },
+    // votes
+    // only tracks number of up VS down votes
+    // Posts does not care who votes, it only tracks ratio of votes.
+    voteCount: {
+      type: Number,
+      default: 0,
     },
     // owner of post (has edit and delete permsissions)
     owner: {
-        type: String,
-        required: true
-    }
-
-}, { timestamps: true });
+      type: String,
+      required: true,
+    },
+  },
+  { timestamps: true }
+);
 
 // const postSchema = mongoose.Schema(postSchemaObject);
 
-const Post= mongoose.model('Post',postSchemaObject);
+const Post = mongoose.model("Post", postSchemaObject);
 
-export {Post}
+export { Post };
