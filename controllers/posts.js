@@ -62,7 +62,7 @@ const getPost = async (req, res) => {
   try {
     const post = await Post.findById(req.params.id);
 
-    res.status(200).json({ post });
+    res.status(200).json(post);
   } catch (error) {
     console.log("Error in GET POST: ", error);
     res.status(500).json({ message: "Error in get post controller" });
