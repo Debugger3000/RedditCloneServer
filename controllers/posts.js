@@ -7,7 +7,6 @@ const createPost = async (req, res) => {
     const {
       title,
       textContent,
-      owner,
       parentThread,
       parentThreadTitle,
       tag,
@@ -19,11 +18,10 @@ const createPost = async (req, res) => {
       textContent: textContent,
       parentThread: parentThread,
       parentThreadTitle: parentThreadTitle,
-      user: req.user._id,
       tag: tag,
       commentCount: 0,
       parentThreadImage: parentThreadImage,
-      owner: owner,
+      owner: req.user._id,
     });
     await post.save();
     res.status(200).json({ post });
