@@ -36,6 +36,18 @@ const userSchemaObject = {
       },
     },
   ],
+  voteOnComments: [
+    {
+      commentId: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Comment",
+      },
+      voteType: {
+        type: Boolean,
+        required: true,
+      },
+    },
+  ],
 };
 
 const userSchema = mongoose.Schema(userSchemaObject);

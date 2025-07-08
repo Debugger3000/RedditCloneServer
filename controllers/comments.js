@@ -1,5 +1,6 @@
 import { Comment } from "../models/comment.js";
 import { Post } from "../models/posts.js";
+import { User } from "../models/users.js";
 
 const createComment = async (req, res) => {
   console.log("Create Comment route hit");
@@ -43,40 +44,7 @@ const getComments = async (req, res) => {
   try {
     const comments = await Comment.find().sort({ createdAt: 1 });
 
-    // clean comment data so it is not flat when it reaches frontend, and front can focus on display
-
-    // iterate from length to index 0. Gradually, adding children to parents children array
-    // as newest comments, can't have any children
-    // mutate original array, since we need to hold parents in case of other children...
-    // for(let i = comments.length - 1; i >= 0; i--) {
-    //     // grab child to check for parents...
-    //     console.log("i: ",i);
-
-    //     // check for parents
-    //     // start at parent - 1
-    //     for(let j = i-1; j >= 0; j--){
-    //         console.log("j: ",j);
-    //         // compare i and tracker which i+1 index
-    //         let parent = comments[j]._id.toString();
-    //         console.log("parent id: ",parent);
-    //         let child = 'tehe';
-    //         if(comments[i].parentComment){
-    //             child = comments[i].parentComment;
-    //         }
-    //         else{
-    //         console.log("child has no parent comment id...");
-    //         }
-    //         console.log("child id: ",child);
-    //         if(parent === child) {
-    //             // remove child and add to parents child list
-    //             let childSpliced = comments.splice(i,1);
-    //             // add child document to parent array
-    //             comments[j].childComments.push(childSpliced[0]);
-    //         }
-    //     }
-    // }
     console.log("----------------------------------------------");
-    // console.log("new comment structure: ", comments);
 
     res.status(200).json({ comments });
   } catch (error) {
@@ -131,4 +99,48 @@ const getCommentsByPost = async (req, res) => {
   }
 };
 
-export { createComment, getComments, getCommentsByPost };
+const commentVote = async (req, res) => {
+  console.log("Comments vote route hit");
+  try {
+    const { commentId, voteType } = req.body;
+
+    // find comment
+    const comment = await Comment.findById(commentId);
+
+    // update posts up or down votes, by incrementing/decrementing based on voteType
+    if (voteType) {
+      // true type of vote so increment votes on post
+      comment.voteCount++;
+    } else {
+      // subtract but make sure postCount is not 0
+      if (comment.voteCount != 0) {
+        comment.voteCount--;
+      }
+    }
+    await comment.save();
+
+    // now change user votes array
+    // grab user, and we add object to its vote array
+    const user = await User.findById(req.user._id);
+    if (user) {
+      // check to see if user already has object for this post
+      const vote = user.voteOnComments.find(
+        (item) => item.commentId == commentId
+      );
+      if (vote) {
+        vote.voteType = voteType;
+      } else {
+        user.voteOnComments.push({ commentId: commentId, voteType: voteType });
+      }
+    }
+    await user.save();
+    console.log("users votes array: ", user.voteOnComments);
+
+    res.status(200).json(comment);
+  } catch (error) {
+    console.log("Error in comment get: ", error);
+    res.status(500).json({ message: "Error in get all comment controller" });
+  }
+};
+
+export { createComment, getComments, getCommentsByPost, commentVote };

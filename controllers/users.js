@@ -144,6 +144,7 @@ const isAuthenticated = async (req, res) => {
         username: req.user.username,
         profileImage: user.profileImage,
         votes: user.votes,
+        voteOnComments: user.voteOnComments,
       });
     } else {
       console.log("User auth status: Bad");
