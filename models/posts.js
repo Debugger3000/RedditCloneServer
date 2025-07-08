@@ -11,13 +11,6 @@ const postSchemaObject = new mongoose.Schema(
       type: String,
       required: true,
     },
-    // Users who exist within the thread
-    user: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "User",
-      // User who creates the thread will be the first one to be added to the thread...
-      required: true,
-    },
     tag: {
       type: String,
     },
@@ -48,7 +41,9 @@ const postSchemaObject = new mongoose.Schema(
     },
     // owner of post (has edit and delete permsissions)
     owner: {
-      type: String,
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User",
+      // User who creates the thread will be the first one to be added to the thread...
       required: true,
     },
   },
