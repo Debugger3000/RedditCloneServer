@@ -143,4 +143,31 @@ const commentVote = async (req, res) => {
   }
 };
 
-export { createComment, getComments, getCommentsByPost, commentVote };
+// delete comment
+const deleteComment = async (req, res) => {
+  console.log("delete Comment route hit");
+  try {
+    const { commentId } = req.body;
+    // const comments = await Comment.find().sort({ createdAt: 1 });
+    await Comment.findByIdAndUpdate(commentId, {
+      ownerUserName: "[deleted]",
+      commentText: "Comment deleted by user",
+      ownerPicture: "",
+    });
+
+    console.log("----------------------------------------------");
+
+    res.status(200);
+  } catch (error) {
+    console.log("Error in comment delete: ", error);
+    res.status(500).json({ message: "Error in delete comment controller" });
+  }
+};
+
+export {
+  createComment,
+  getComments,
+  getCommentsByPost,
+  commentVote,
+  deleteComment,
+};

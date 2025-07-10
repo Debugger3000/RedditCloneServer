@@ -9,6 +9,7 @@ import {
   getComments,
   getCommentsByPost,
   commentVote,
+  deleteComment,
 } from "../controllers/comments.js";
 
 // Post a new thread to collection
@@ -16,5 +17,6 @@ router.post("/", createComment);
 router.get("/", getComments);
 router.get("/:id", getCommentsByPost);
 router.post("/vote", commentVote);
+router.delete("/", deleteComment);
 
 export default router;
