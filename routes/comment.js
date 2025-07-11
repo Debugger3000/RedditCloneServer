@@ -17,6 +17,6 @@ router.post("/", createComment);
 router.get("/", getComments);
 router.get("/:id", getCommentsByPost);
 router.post("/vote", commentVote);
-router.delete("/", deleteComment);
+router.delete("/:id", deleteComment);
 
 export default router;
