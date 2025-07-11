@@ -147,9 +147,9 @@ const commentVote = async (req, res) => {
 const deleteComment = async (req, res) => {
   console.log("delete Comment route hit");
   try {
-    const { commentId } = req.body;
+    // const { commentId } = req.body;
     // const comments = await Comment.find().sort({ createdAt: 1 });
-    await Comment.findByIdAndUpdate(commentId, {
+    await Comment.findByIdAndUpdate(req.params.id, {
       ownerUserName: "[deleted]",
       commentText: "Comment deleted by user",
       ownerPicture: "",
