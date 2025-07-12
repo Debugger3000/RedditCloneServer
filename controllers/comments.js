@@ -157,7 +157,7 @@ const deleteComment = async (req, res) => {
 
     console.log("----------------------------------------------");
 
-    res.status(200);
+    res.status(200).json({ message: "Item deleted" });
   } catch (error) {
     console.log("Error in comment delete: ", error);
     res.status(500).json({ message: "Error in delete comment controller" });
