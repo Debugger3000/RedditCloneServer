@@ -164,10 +164,30 @@ const deleteComment = async (req, res) => {
   }
 };
 
+// edit a comment
+const editComment = async (req, res) => {
+  console.log("edit Comment route hit");
+  try {
+    const { commentId, commentText } = req.body;
+    // const comments = await Comment.find().sort({ createdAt: 1 });
+    await Comment.findByIdAndUpdate(commentId, {
+      commentText: commentText,
+    });
+
+    console.log("----------------------------------------------");
+
+    res.status(200).json({ message: "comment has been edited !" });
+  } catch (error) {
+    console.log("Error in comment edit: ", error);
+    res.status(500).json({ message: "Error in edit comment controller" });
+  }
+};
+
 export {
   createComment,
   getComments,
   getCommentsByPost,
   commentVote,
   deleteComment,
+  editComment,
 };
