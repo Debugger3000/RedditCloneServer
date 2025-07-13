@@ -175,6 +175,8 @@ const editComment = async (req, res) => {
     });
 
     console.log("tehe test git basic script !");
+    console.log("tehe test git basic script  02!");
+
     console.log("----------------------------------------------");
 
     res.status(200).json({ message: "comment has been edited !" });
