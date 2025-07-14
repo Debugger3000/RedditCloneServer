@@ -15,6 +15,7 @@ import userRouter from "./routes/user.js";
 import threadRouter from "./routes/threads.js";
 import postRouter from "./routes/post.js";
 import commentRouter from "./routes/comment.js";
+import userDataRouter from "./routes/userData.js";
 // github
 
 // -----------------
@@ -95,6 +96,8 @@ app.use("/api/user", userRouter);
 app.use("/api/thread", threadRouter);
 app.use("/api/post", postRouter);
 app.use("/api/comment", commentRouter);
+app.use("/api/userData", userDataRouter);
+
 // app.use('/auth', githubRouter);
 
 // listen to a port
