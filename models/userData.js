@@ -23,15 +23,18 @@ const userDataSchemaObject = {
   // updates whenever the user clicks on a thread
   // sorted by: most recent, on top / first --- STACK
   //
-  recentThreads: [
+  recentThreads: {
     // _id for this object
 
-    {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "Thread",
-      // User who creates the thread will be the first one to be added to the thread...
-    },
-  ],
+    threadIdList: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Thread",
+        // User who creates the thread will be the first one to be added to the thread...
+      },
+    ],
+    default: [],
+  },
 };
 
 const userDataSchema = mongoose.Schema(userDataSchemaObject);

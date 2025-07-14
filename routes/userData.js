@@ -11,6 +11,6 @@ import {
 
 // Post a new thread to collection
 router.get("/recentThreads", getUserRecentThreads);
-router.post("/recentThreads", updateRecentThreads);
+router.patch("/recentThreads", updateRecentThreads);
 
 export default router;
