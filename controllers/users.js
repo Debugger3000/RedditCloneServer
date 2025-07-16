@@ -148,7 +148,7 @@ const isAuthenticated = async (req, res) => {
       });
     } else {
       console.log("User auth status: Bad");
-      res.status(500).json({ status: false, userId: null, username: null });
+      res.status(404).json({ status: false, userId: null, username: null });
     }
   } catch (error) {
     console.log("Error in Authentication: ", error);

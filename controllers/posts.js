@@ -34,8 +34,18 @@ const createPost = async (req, res) => {
 const getPostsForThread = async (req, res) => {
   console.log("Get posts for a thread route hit");
   try {
-    const posts = await Post.find({ parentThread: req.params.id });
-    res.status(200).json({ posts });
+    const limit = parseInt(req.query.limit);
+    const page = parseInt(req.query.page);
+    console.log("limit is now: ", limit);
+    console.log("page before is now: ", page);
+    const skip = (page - 1) * 5;
+    console.log("page after is now: ", page);
+
+    const posts = await Post.find({ parentThread: req.params.id })
+      .skip(skip)
+      .limit(limit)
+      .sort({ createdAt: -1 });
+    res.status(200).json(posts);
   } catch (error) {
     console.log("Error in post Create: ", error);
     res.status(500).json({ message: "Error in create post controller" });
@@ -45,9 +55,22 @@ const getPostsForThread = async (req, res) => {
 const getPosts = async (req, res) => {
   console.log("Get ALL posts for a thread route hit");
   try {
-    const posts = await Post.find().sort({ createdAt: -1 });
+    // const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit);
+    const page = parseInt(req.query.page);
+    console.log("limit is now: ", limit);
+    console.log("page before is now: ", page);
+    const skip = (page - 1) * 5;
+    console.log("page after is now: ", page);
 
-    res.status(200).json({ posts });
+    const posts = await Post.find()
+      .skip(skip)
+      .limit(limit)
+      .sort({ createdAt: -1 });
+
+    console.log("posts length: ", posts.length);
+
+    res.status(200).json(posts);
   } catch (error) {
     console.log("Error in post GET ALL POSTS: ", error);
     res.status(500).json({ message: "Error in create post controller" });

@@ -14,11 +14,11 @@ import {
 } from "../controllers/posts.js";
 
 // Post a new thread to collection
-router.post("/", createPost);
-router.get("/", getPosts);
 router.get("/:id", getPostsForThread);
 router.get("/single/:id", getPost);
 router.delete("/:id", deletePost);
+router.post("/", createPost);
+router.get("/", getPosts);
 
 // votes
 router.post("/vote", vote);
