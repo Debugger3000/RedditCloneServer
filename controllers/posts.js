@@ -37,17 +37,14 @@ const getPostsForThread = async (req, res) => {
     const limit = parseInt(req.query.limit);
     const page = parseInt(req.query.page);
 
-    const feedType = parseInt(req.query.feedType);
+    const feedType = req.query.feedType;
     // -1 by default so always grabbing latest...
-    const sortVal = -1;
+    let sortVal = -1;
     if (feedType === "oldest") {
       sortVal = 1;
     }
 
-    console.log("limit is now: ", limit);
-    console.log("page before is now: ", page);
     const skip = (page - 1) * 5;
-    console.log("page after is now: ", page);
 
     const posts = await Post.find({ parentThread: req.params.id })
       .skip(skip)
