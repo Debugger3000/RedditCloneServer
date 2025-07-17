@@ -36,6 +36,14 @@ const getPostsForThread = async (req, res) => {
   try {
     const limit = parseInt(req.query.limit);
     const page = parseInt(req.query.page);
+
+    const feedType = parseInt(req.query.feedType);
+    // -1 by default so always grabbing latest...
+    const sortVal = -1;
+    if (feedType === "oldest") {
+      sortVal = 1;
+    }
+
     console.log("limit is now: ", limit);
     console.log("page before is now: ", page);
     const skip = (page - 1) * 5;
@@ -44,7 +52,7 @@ const getPostsForThread = async (req, res) => {
     const posts = await Post.find({ parentThread: req.params.id })
       .skip(skip)
       .limit(limit)
-      .sort({ createdAt: -1 });
+      .sort({ createdAt: sortVal });
     res.status(200).json(posts);
   } catch (error) {
     console.log("Error in post Create: ", error);
@@ -58,15 +66,23 @@ const getPosts = async (req, res) => {
     // const page = parseInt(req.query.page) || 1;
     const limit = parseInt(req.query.limit);
     const page = parseInt(req.query.page);
-    console.log("limit is now: ", limit);
-    console.log("page before is now: ", page);
+    const feedType = req.query.feedType;
+    console.log("feedStype: ", feedType);
+    // -1 by default so always grabbing latest...
+    let sortVal = -1;
+    if (feedType === "oldest") {
+      sortVal = 1;
+    }
+    console.log("feedStype: ", sortVal);
+    // console.log("limit is now: ", limit);
+    // console.log("page before is now: ", page);
     const skip = (page - 1) * 5;
-    console.log("page after is now: ", page);
+    // console.log("page after is now: ", page);
 
     const posts = await Post.find()
       .skip(skip)
       .limit(limit)
-      .sort({ createdAt: -1 });
+      .sort({ createdAt: sortVal });
 
     console.log("posts length: ", posts.length);
 
