@@ -72,11 +72,9 @@ const userRegister = function (req, res, next) {
 
     try {
       if (!user) {
-        res.status(500).json({ status: false });
-      }
-      // error happened during register authentication
-      else if (err) {
-        res.status(500).json({ status: false });
+        res
+          .status(500)
+          .json({ status: false, email: info.email, username: info.username });
       }
       // if user exists then auth is fine, so we log the user in...
       else {
