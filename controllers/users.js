@@ -1,5 +1,7 @@
 import { User } from "../models/users.js";
 import passport from "passport";
+import { deleteObject, ref } from "firebase/storage";
+import { deleteFirebaseImage, storage } from "../middleware/firebase.js";
 
 // controllers
 // ----------------------------------------
@@ -21,7 +23,7 @@ const userGet = async (req, res) => {
   try {
     console.log("id on params.id: ", req.params.id);
     // grab all users
-    const user = await User.findById(req.params.id);
+    const user = await User.findById(req.params.id).select("-profileImagePath");
     // console.log("user grabbed in userGET: ",user);
     res.status(200).json(user);
   } catch (error) {
@@ -183,11 +185,36 @@ const isAuthenticated = async (req, res) => {
 const editProfile = async (req, res) => {
   console.log("edit profile route /api/user has been hit");
   try {
-    const { profileImage } = req.body;
+    const { profileImage, profileImagePath } = req.body;
     const newUser = {
       profileImage: profileImage,
+      profileImagePath: profileImagePath,
     };
-    const user = await User.findByIdAndUpdate(req.params.id, newUser);
+
+    // grab old filePath if there is one...
+    const oldUser = await User.findById(req.params.id);
+
+    const filePath = oldUser.profileImagePath;
+    console.log("old user image file path: ", filePath);
+
+    if (filePath) {
+      try {
+        console.log("firebase storage: ", storage);
+        // give filePath to firebase delete function...
+        deleteFirebaseImage(filePath);
+      } catch (error) {
+        console.log("error in edit profile delete image: ", error);
+      }
+    }
+    // delete users old image from firebase since we changed it and dont need it
+
+    // await deleteObject(refer);
+    // console.log("deleted old profile image from firebase storage !");
+
+    // update user profile
+    const user = await User.findByIdAndUpdate(req.params.id, newUser).select(
+      "-profileImagePath"
+    );
 
     res.status(200).json({ user });
   } catch (error) {

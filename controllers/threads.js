@@ -4,20 +4,28 @@ const createThread = async (req, res) => {
   console.log("Create thread route hit");
   console.log("----------------------------");
   try {
-    const { title, bio, links, tags, username, threadImage } = req.body;
+    const { title, bio, links, tags, username, threadImage, threadImagePath } =
+      req.body;
     const thread = new Thread({
       title: title,
       bio: bio,
       links: links,
       tags: tags,
       threadImage: threadImage,
+      threadImagePath: threadImagePath,
       followers: [req.user._id],
       followersCount: 1,
       owner: username,
     });
     console.log("new thread object: ", thread);
     await thread.save();
-    res.status(200).json({ thread });
+
+    // grab new thead, without theadImagePath
+    const returnThread = await Thread.findById(thread._id).select(
+      "-threadImagePath"
+    );
+
+    res.status(200).json(returnThread);
   } catch (error) {
     console.log("Error in thread Create: ", error);
     res.status(500).json({ message: "Error in create thread controller" });
@@ -27,7 +35,7 @@ const createThread = async (req, res) => {
 const editThread = async (req, res) => {
   console.log("Edit thread route hit");
   try {
-    const { title, bio, links, tags, threadImage } = req.body;
+    const { title, bio, links, tags, threadImage, threadImagePath } = req.body;
 
     const newThread = {
       title: title,
@@ -35,21 +43,17 @@ const editThread = async (req, res) => {
       links: links,
       tags: tags,
       threadImage: threadImage,
+      threadImagePath: threadImagePath,
     };
 
-    const thread = await Thread.findByIdAndUpdate(req.params.id, newThread);
+    console.log("new ThreadObject: ", newThread);
 
-    // const thread = new Thread({
-    //     title: title,
-    //     bio: bio,
-    //     links: links,
-    //     tags: tags,
-    //     followers: [req.user._id],
-    //     followersCount: 1,
-    //     owner: req.user._id
-    // });
+    const thread = await Thread.findByIdAndUpdate(
+      req.params.id,
+      newThread
+    ).select("-threadImagePath");
 
-    res.status(200).json({ thread });
+    res.status(200).json(thread);
   } catch (error) {
     console.log("Error in thread Create: ", error);
     res.status(500).json({ message: "Error in create thread controller" });
@@ -70,7 +74,9 @@ const getThreads = async (req, res) => {
 const getThread = async (req, res) => {
   console.log("Get a single thread hit...");
   try {
-    const thread = await Thread.findById(req.params.id);
+    const thread = await Thread.findById(req.params.id).select(
+      "-threadImagePath"
+    );
     res.status(200).json(thread);
   } catch (error) {
     console.log("Error in single thread GET: ", error);
