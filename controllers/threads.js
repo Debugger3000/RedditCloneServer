@@ -2,6 +2,7 @@ import { Thread } from "../models/threads.js";
 
 const createThread = async (req, res) => {
   console.log("Create thread route hit");
+  console.log("----------------------------");
   try {
     const { title, bio, links, tags, username, threadImage } = req.body;
     const thread = new Thread({
@@ -14,6 +15,7 @@ const createThread = async (req, res) => {
       followersCount: 1,
       owner: username,
     });
+    console.log("new thread object: ", thread);
     await thread.save();
     res.status(200).json({ thread });
   } catch (error) {
