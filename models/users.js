@@ -21,6 +21,12 @@ const userSchemaObject = {
     type: String,
     default: "",
   },
+  // Main image for user...
+  profileImagePath: {
+    type: String,
+    default: "",
+  },
+
   // hold user votes.
   // easier than comparing public post votes to each single user, where there is public data
   // used to show whether current user has up or down voted for a particular post...
