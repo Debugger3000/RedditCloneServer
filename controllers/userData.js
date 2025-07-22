@@ -18,7 +18,7 @@ const getUserRecentThreads = async (req, res) => {
 
       await newUserData.save();
 
-      console.log("creating new userData Document...");
+      // console.log("creating new userData Document...");
 
       // const newSortedThreads = await findRecentThreadsSort(
       // newUserData.recentThreads.threadIdList
@@ -46,7 +46,7 @@ const updateRecentThreads = async (req, res) => {
   console.log("update user recent threads route hit");
   try {
     const { threadId } = req.body;
-    console.log("thread id for update: ", threadId);
+    // console.log("thread id for update: ", threadId);
     // get userData schema object
     const userData = await UserData.findOne({ userId: req.user._id });
 
@@ -103,16 +103,16 @@ async function findRecentThreadsSort(threadIdArray) {
   // go through array
   //  [1,2,3,4,5]
   // grab documents by id in array
-  console.log("threadIdArray in sorter: ", threadIdArray);
+  // console.log("threadIdArray in sorter: ", threadIdArray);
   const recentThreads = await Thread.find({ _id: { $in: threadIdArray } });
 
   // sort them, pop each one in order of original array, with while until empty...
   const copy = [...recentThreads];
 
   // console.log("copy of thread object array", copy);
-  for (let i = 0; i < copy.length; i++) {
-    console.log("thread id: ", copy[i]._id);
-  }
+  // for (let i = 0; i < copy.length; i++) {
+  //   console.log("thread id: ", copy[i]._id);
+  // }
   // edge cases:
   // cannot have duplicates
   //
@@ -127,13 +127,13 @@ async function findRecentThreadsSort(threadIdArray) {
       // console.log("theadidarray: ", threadIdArray[i]);
       if (threadIdArray[i].toString() == id.toString()) {
         sorted.push(copy[j]);
-        console.log("index match: ", i);
+        // console.log("index match: ", i);
         break;
       }
     }
   }
 
-  console.log("copy after sorted: ", sorted.length);
+  // console.log("copy after sorted: ", sorted.length);
 
   return sorted;
 }
