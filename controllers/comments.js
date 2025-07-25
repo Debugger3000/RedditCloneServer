@@ -61,6 +61,45 @@ const getCommentsByPost = async (req, res) => {
       createdAt: 1,
     });
 
+    // hydrate comment data with users image link
+
+    // step 1
+    // Go through data grab list of each unique user id
+    let userIds = [];
+    const seen = new Set();
+    for (let i = 0; i < comments.length; i++) {
+      const ownerId = comments[i].owner;
+      if (!seen.has(ownerId)) {
+        seen.add(ownerId);
+        userIds.push(ownerId);
+      }
+    }
+    console.log("user ids....", userIds);
+
+    // step 2 grab user list from list of ids
+    const users = await User.find({ _id: { $in: userIds } }).select(
+      "_id profileImage"
+    );
+    console.log("users grabbed....", users);
+    // step 3 - append profileImage to each comment structure where id matches document...
+    for (let i = 0; i < users.length; i++) {
+      const userId = users[i]._id.toString();
+      for (let j = 0; j < comments.length; j++) {
+        // equal therefore hydarte this document with image
+        if (userId === comments[j].owner.toString()) {
+          console.log(
+            "ids equal----- current comment imge:",
+            comments[j].ownerPicture
+          );
+          console.log("user profile image: ", users[i].profileImage);
+          comments[j].ownerPicture = users[i].profileImage;
+        }
+      }
+    }
+
+    console.log("comments after hydration: ", comments);
+
+    // Un-flatten comment data structure into a nested structure for viewing...
     for (let i = comments.length - 1; i > 0; i--) {
       // grab child to check for parents...
       // console.log("i: ",i);
