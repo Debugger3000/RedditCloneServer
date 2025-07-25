@@ -1,3 +1,7 @@
+import {
+  generalUserHydration,
+  hydratePostsWithUserImage,
+} from "../middleware/hydration/postHydration.js";
 import { Post } from "../models/posts.js";
 import { User } from "../models/users.js";
 
@@ -49,8 +53,15 @@ const getPostsForThread = async (req, res) => {
     const posts = await Post.find({ parentThread: req.params.id })
       .skip(skip)
       .limit(limit)
-      .sort({ createdAt: sortVal });
-    res.status(200).json(posts);
+      .sort({ createdAt: sortVal })
+      .lean();
+
+    // hydrate posts
+    const postUsers = await generalUserHydration(posts);
+    const hydratedPosts = hydratePostsWithUserImage(postUsers, posts);
+
+    console.log("hydrated posts: ", hydratedPosts);
+    res.status(200).json(hydratedPosts);
   } catch (error) {
     console.log("Error in post Create: ", error);
     res.status(500).json({ message: "Error in create post controller" });
@@ -58,7 +69,7 @@ const getPostsForThread = async (req, res) => {
 };
 
 const getPosts = async (req, res) => {
-  console.log("Get ALL posts for a thread route hit");
+  console.log("Get ALL posts for HOME route hit");
   try {
     // const page = parseInt(req.query.page) || 1;
     const limit = parseInt(req.query.limit);

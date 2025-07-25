@@ -1,3 +1,5 @@
+import { commentHydrate } from "../middleware/hydration/commentHydration.js";
+import { generalUserHydration } from "../middleware/hydration/postHydration.js";
 import { Comment } from "../models/comment.js";
 import { Post } from "../models/posts.js";
 import { User } from "../models/users.js";
@@ -62,45 +64,15 @@ const getCommentsByPost = async (req, res) => {
     });
 
     // hydrate comment data with users image link
+    // get users to hydrate comments with...
+    const users = await generalUserHydration(comments);
+    // hydrate comment documents with user image data
+    const hydratedComments = commentHydrate(users, comments);
 
-    // step 1
-    // Go through data grab list of each unique user id
-    let userIds = [];
-    const seen = new Set();
-    for (let i = 0; i < comments.length; i++) {
-      const ownerId = comments[i].owner;
-      if (!seen.has(ownerId)) {
-        seen.add(ownerId);
-        userIds.push(ownerId);
-      }
-    }
-    console.log("user ids....", userIds);
-
-    // step 2 grab user list from list of ids
-    const users = await User.find({ _id: { $in: userIds } }).select(
-      "_id profileImage"
-    );
-    console.log("users grabbed....", users);
-    // step 3 - append profileImage to each comment structure where id matches document...
-    for (let i = 0; i < users.length; i++) {
-      const userId = users[i]._id.toString();
-      for (let j = 0; j < comments.length; j++) {
-        // equal therefore hydarte this document with image
-        if (userId === comments[j].owner.toString()) {
-          console.log(
-            "ids equal----- current comment imge:",
-            comments[j].ownerPicture
-          );
-          console.log("user profile image: ", users[i].profileImage);
-          comments[j].ownerPicture = users[i].profileImage;
-        }
-      }
-    }
-
-    console.log("comments after hydration: ", comments);
+    console.log("comments after hydration: ", hydratedComments);
 
     // Un-flatten comment data structure into a nested structure for viewing...
-    for (let i = comments.length - 1; i > 0; i--) {
+    for (let i = hydratedComments.length - 1; i > 0; i--) {
       // grab child to check for parents...
       // console.log("i: ",i);
 
@@ -109,27 +81,27 @@ const getCommentsByPost = async (req, res) => {
       for (let j = i - 1; j >= 0; j--) {
         // console.log("j: ",j);
         // compare i and tracker which i+1 index
-        let parent = comments[j]._id.toString();
+        let parent = hydratedComments[j]._id.toString();
         // console.log("parent id: ",parent);
         let child = "tehe";
         // console.log("comment: ",comments[i]);
-        if (comments[i].parentComment) {
-          child = comments[i].parentComment;
+        if (hydratedComments[i].parentComment) {
+          child = hydratedComments[i].parentComment;
         } else {
           //   console.log("child has no parent comment id...");
         }
         // console.log("child id: ",child);
         if (parent === child) {
           // remove child and add to parents child list
-          let childSpliced = comments.splice(i, 1);
+          let childSpliced = hydratedComments.splice(i, 1);
           // add child document to parent array
-          comments[j].childComments.push(childSpliced[0]);
+          hydratedComments[j].childComments.push(childSpliced[0]);
           break;
         }
       }
     }
 
-    res.status(200).json(comments);
+    res.status(200).json(hydratedComments);
   } catch (error) {
     console.log("Error in get comments by post get: ", error);
     res
