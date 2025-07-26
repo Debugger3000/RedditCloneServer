@@ -60,7 +60,7 @@ const getPostsForThread = async (req, res) => {
     const postUsers = await generalUserHydration(posts);
     const hydratedPosts = hydratePostsWithUserImage(postUsers, posts);
 
-    console.log("hydrated posts: ", hydratedPosts);
+    // console.log("hydrated posts: ", hydratedPosts);
     res.status(200).json(hydratedPosts);
   } catch (error) {
     console.log("Error in post Create: ", error);

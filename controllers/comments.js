@@ -69,7 +69,7 @@ const getCommentsByPost = async (req, res) => {
     // hydrate comment documents with user image data
     const hydratedComments = commentHydrate(users, comments);
 
-    console.log("comments after hydration: ", hydratedComments);
+    // console.log("comments after hydration: ", hydratedComments);
 
     // Un-flatten comment data structure into a nested structure for viewing...
     for (let i = hydratedComments.length - 1; i > 0; i--) {
