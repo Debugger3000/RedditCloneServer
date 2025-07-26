@@ -12,10 +12,12 @@ const threadSchemaObject = new mongoose.Schema(
     // Main image for thread...
     threadImage: {
       type: String,
+      default: "",
     },
     // main image path for thread
     threadImagePath: {
       type: String,
+      default: "",
     },
 
     bio: {

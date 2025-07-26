@@ -9,7 +9,7 @@ export function commentHydrate(users, comments) {
           "ids equal----- current comment image:",
           comments[j].ownerPicture
         );
-        console.log("user profile image: ", users[i].profileImage);
+        // console.log("user profile image: ", users[i].profileImage);
         comments[j].ownerPicture = users[i].profileImage;
       }
     }
