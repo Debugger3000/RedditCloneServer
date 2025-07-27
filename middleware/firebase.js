@@ -12,7 +12,7 @@ function getFirebaseStorage() {
     appId: process.env.FIREBASE_appId,
     measurementId: process.env.FIREBASE_measurementId,
   };
-  console.log("storage item used for firebase delete: ", storage);
+  // console.log("storage item used for firebase delete: ", storage);
   return storage;
 }
 

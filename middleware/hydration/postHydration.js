@@ -16,7 +16,7 @@ export async function generalUserHydration(collection) {
 
   // step 2 grab user list from list of ids
   const users = await User.find({ _id: { $in: userIds } }).select(
-    "_id profileImage"
+    "_id profileImage username"
   );
   console.log("users grabbed....", users);
   return users;
@@ -33,8 +33,9 @@ export function hydratePostsWithUserImage(users, posts) {
           "ids equal----- current comment imge:",
           posts[j].ownerPicture
         );
-        console.log("user profile image: ", users[i].profileImage);
+        console.log("user profile image: ", users[i]);
         posts[j].ownerPicture = users[i].profileImage;
+        posts[j].ownerUsername = users[i].username;
       }
     }
   }
