@@ -1,5 +1,6 @@
 import { User } from "../../models/users.js";
 
+// general hydration - which takes list of user ids, and returns mongo User Documents in a list
 export async function generalUserHydration(collection) {
   // step 1
   // Go through data grab list of each unique user id
