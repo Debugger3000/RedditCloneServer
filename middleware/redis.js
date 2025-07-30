@@ -7,6 +7,6 @@ export const client = await createClient({
 })
   .on("error", (err) => console.log("Redis Client Error", err))
   .on("ready", () => {
-    console.log("Redis client is ready !");
+    console.log("Local Redis client is ready !");
   })
   .connect();

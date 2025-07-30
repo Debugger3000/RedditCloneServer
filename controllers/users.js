@@ -116,9 +116,14 @@ const userLogin = function (req, res, next) {
         req.login(user, async (error) => {
           console.log("User logged in !");
           console.log("Is User Authenticated: ", req.isAuthenticated());
-          res
-            .status(200)
-            .json({ status: true, username: user.username, _id: user._id });
+          res.status(200).json({
+            status: true,
+            username: user.username,
+            _id: user._id,
+            profileImage: user.profileImage,
+            votes: user.votes,
+            voteOnComments: user.voteOnComments,
+          });
         });
       }
     } catch (error) {
@@ -133,18 +138,18 @@ const isAuthenticated = async (req, res) => {
     console.log("Checking user auth has been hit");
     if (req.user) {
       console.log("User auth status: Good");
-      //   console.log("user object: ", req.user);
-      console.log("user object: ", req.user._id);
+      console.log("user object: ", req.user);
+      console.log("user object: ", req);
 
-      const user = await User.findById(req.user._id);
+      // const user = await User.findById(req.user._id);
 
       res.status(200).json({
         status: true,
         _id: req.user._id,
         username: req.user.username,
-        profileImage: user.profileImage,
-        votes: user.votes,
-        voteOnComments: user.voteOnComments,
+        profileImage: req.user.profileImage,
+        votes: req.user.votes,
+        voteOnComments: req.user.voteOnComments,
       });
     } else {
       console.log("User auth status: Bad");
@@ -155,32 +160,6 @@ const isAuthenticated = async (req, res) => {
     res.status(500).json({ status: false, userId: null, username: null });
   }
 };
-
-// Github authentication....
-
-// const githubAuthenticateCallback = (req,res) => {
-//     passport.authenticate('github', { failureRedirect: '/login' }),
-//     // if successful this gets called...
-//     function(req, res) {
-//       // Successful authentication, redirect home.
-//       console.log("github authentication has been successful...");
-//       res.redirect('/home');
-//     };
-
-// }
-
-// const githubAuthenticate = (req,res) => {
-//     console.log("first github route hit, /auth/github");
-//     passport.authenticate('github');
-// }
-
-// app.get('/auth/github/callback',
-//     passport.authenticate('github', { failureRedirect: '/login' }),
-//     function(req, res) {
-//       // Successful authentication, redirect home.
-//       console.log("github authentication has been successful...");
-//       res.redirect('http://localhost:4200/home');
-//     });
 
 const editProfile = async (req, res) => {
   console.log("edit profile route /api/user has been hit");
