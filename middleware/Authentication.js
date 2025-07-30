@@ -11,10 +11,10 @@ import dotenv from "dotenv";
 
 dotenv.config({ path: `./.env.${process.env.NODE_ENV}` });
 
-console.log("middle ware file has run...");
+// console.log("middle ware file has run...");
 
-console.log("clientId: ", process.env.GITHUB_CLIENT_ID);
-console.log("CALLBACK: ", process.env.GITHUB_CALLBACK);
+// console.log("clientId: ", process.env.GITHUB_CLIENT_ID);
+// console.log("CALLBACK: ", process.env.GITHUB_CALLBACK);
 
 // github
 passport.use(
