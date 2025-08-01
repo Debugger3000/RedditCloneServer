@@ -4,6 +4,7 @@ import {
 } from "../middleware/hydration/postHydration.js";
 import { Post } from "../models/posts.js";
 import { User } from "../models/users.js";
+import { getCacheData, setCacheData } from "../middleware/redis.js";
 
 const createPost = async (req, res) => {
   console.log("Create Post route hit");
@@ -68,6 +69,7 @@ const getPostsForThread = async (req, res) => {
   }
 };
 
+// get posts for home...
 const getPosts = async (req, res) => {
   console.log("Get ALL posts for HOME route hit");
   try {
@@ -76,25 +78,42 @@ const getPosts = async (req, res) => {
     const page = parseInt(req.query.page);
     const feedType = req.query.feedType;
     console.log("feedStype: ", feedType);
-    // -1 by default so always grabbing latest...
-    let sortVal = -1;
-    if (feedType === "oldest") {
-      sortVal = 1;
+
+    // cache key based on pagination page and feedType
+    const redisKey = `home:${page}:${feedType}`;
+
+    // check cache for data first before any DB calls
+    const cached = await getCacheData(redisKey);
+    console.log("returned cached data before IF: ", cached);
+    // console.log("length of cached: ", cached.length);
+    if (cached && cached.length == limit) {
+      console.log("We grabbed cached data !");
+      res.status(200).json(cached); // ✅ Cache hit
+    } else {
+      // -1 by default so always grabbing latest...
+      let sortVal = -1;
+      if (feedType === "oldest") {
+        sortVal = 1;
+      }
+      console.log("feedStype: ", sortVal);
+      // console.log("limit is now: ", limit);
+      // console.log("page before is now: ", page);
+      const skip = (page - 1) * 5;
+      // console.log("page after is now: ", page);
+
+      const posts = await Post.find()
+        .skip(skip)
+        .limit(limit)
+        .sort({ createdAt: sortVal });
+
+      // set cache data for posts return
+      const cachedData = await setCacheData(redisKey, posts);
+      console.log("We grabbed from DB, and set Cached data");
+
+      console.log("posts length: ", posts.length);
+
+      res.status(200).json(posts);
     }
-    console.log("feedStype: ", sortVal);
-    // console.log("limit is now: ", limit);
-    // console.log("page before is now: ", page);
-    const skip = (page - 1) * 5;
-    // console.log("page after is now: ", page);
-
-    const posts = await Post.find()
-      .skip(skip)
-      .limit(limit)
-      .sort({ createdAt: sortVal });
-
-    console.log("posts length: ", posts.length);
-
-    res.status(200).json(posts);
   } catch (error) {
     console.log("Error in post GET ALL POSTS: ", error);
     res.status(500).json({ message: "Error in create post controller" });

@@ -139,7 +139,7 @@ const isAuthenticated = async (req, res) => {
     if (req.user) {
       console.log("User auth status: Good");
       console.log("user object: ", req.user);
-      console.log("user object: ", req);
+      // console.log("user object: ", req);
 
       // const user = await User.findById(req.user._id);
 

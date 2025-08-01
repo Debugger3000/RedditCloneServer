@@ -1,5 +1,6 @@
 import { UserData } from "../models/userData.js";
 import { Thread } from "../models/threads.js";
+import { bucketStorage } from "../middleware/firebase.js";
 
 const getUserRecentThreads = async (req, res) => {
   console.log("get user recent threads route hit");
@@ -138,4 +139,36 @@ async function findRecentThreadsSort(threadIdArray) {
   return sorted;
 }
 
-export { getUserRecentThreads, updateRecentThreads };
+const firebaseUpload = async (req, res) => {
+  console.log("get user recent threads route hit");
+  try {
+    // const fileName = req.params.fileName;
+    const fileName = req.query.fileName;
+    const fileType = req.query.fileType;
+    console.log("file type here: ", fileType);
+
+    const bucket = await bucketStorage();
+    const file = bucket.file(fileName);
+
+    const [url] = await file.getSignedUrl({
+      version: "v4",
+      action: "write", // signed URL allows upload (PUT)
+      expires: Date.now() + 15 * 60 * 1000, // 15 minutes
+      contentType: fileType, // e.g., 'image/jpeg'
+    });
+
+    console.log("signed url: ", url);
+    if (url) {
+      res.status(200).json(url);
+    } else {
+      res.status(200).json(null);
+    }
+  } catch (error) {
+    console.log("Error in get users recent threads: ", error);
+    res
+      .status(500)
+      .json({ message: "Error in get user recent threads controller" });
+  }
+};
+
+export { getUserRecentThreads, updateRecentThreads, firebaseUpload };
