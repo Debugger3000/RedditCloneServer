@@ -149,4 +149,16 @@ const firebaseUpload = async (req, res) => {
   }
 };
 
-export { getUserRecentThreads, updateRecentThreads, firebaseUpload };
+const skeleton = async (req, res) => {
+  console.log("skelly belly");
+  try {
+    res.status(200).json("test route...");
+  } catch (error) {
+    console.log("Error in get users recent threads: ", error);
+    res
+      .status(500)
+      .json({ message: "Error in get user recent threads controller" });
+  }
+};
+
+export { getUserRecentThreads, updateRecentThreads, firebaseUpload, skeleton };
