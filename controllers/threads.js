@@ -111,12 +111,12 @@ const joinThread = async (req, res) => {
     }
     // if aleady joined then you can remove them...
     else {
-      console.log("followers before slice: ", thread.followers);
+      // console.log("followers before slice: ", thread.followers);
       const index = thread.followers.indexOf(req.user._id);
-      console.log("index grabbed is: ", index);
+      // console.log("index grabbed is: ", index);
       thread.followers.splice(index, 1);
-      console.log("slice performned...");
-      console.log("followers after slice: ", thread.followers);
+      // console.log("slice performned...");
+      // console.log("followers after slice: ", thread.followers);
     }
 
     await thread.save();

@@ -1,5 +1,4 @@
 import { createClient } from "redis";
-import dotenv from "dotenv";
 
 // create redis client instance for server to utilize...
 export const client = await createClient({
