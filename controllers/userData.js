@@ -19,12 +19,6 @@ const getUserRecentThreads = async (req, res) => {
 
       await newUserData.save();
 
-      // console.log("creating new userData Document...");
-
-      // const newSortedThreads = await findRecentThreadsSort(
-      // newUserData.recentThreads.threadIdList
-      // );
-
       res.status(200).json({ threadList: [] });
     } else {
       // console.log("userData in get Recent: ", userData.recentThreads);
@@ -47,20 +41,12 @@ const updateRecentThreads = async (req, res) => {
   console.log("update user recent threads route hit");
   try {
     const { threadId } = req.body;
-    // console.log("thread id for update: ", threadId);
     // get userData schema object
     const userData = await UserData.findOne({ userId: req.user._id });
 
-    // console.log("update original array: ", userData);
     // add threadId to list of recent threads
     let copy = [...userData.recentThreads.threadIdList];
-    // console.log("copy: ", copy);
-    // check if it already exists in the array, if so, then find it, splice, and unshift to start
-    // let find = copy.findIndex(threadId);
-    // let index = -1;
-    // for(let i = 0; i < copy.length; i++){
-    //   if(threadId == )
-    // }
+
     const index = copy.findIndex((id) => id == threadId);
     // console.log("index from duplicate search: ", index);
     if (index !== -1) {
@@ -110,14 +96,6 @@ async function findRecentThreadsSort(threadIdArray) {
   // sort them, pop each one in order of original array, with while until empty...
   const copy = [...recentThreads];
 
-  // console.log("copy of thread object array", copy);
-  // for (let i = 0; i < copy.length; i++) {
-  //   console.log("thread id: ", copy[i]._id);
-  // }
-  // edge cases:
-  // cannot have duplicates
-  //
-  // console.log("copy before sort: ", copy);
   let sorted = [];
   for (let i = 0; i < copy.length; i++) {
     // console.log("i: ", i);
@@ -134,7 +112,7 @@ async function findRecentThreadsSort(threadIdArray) {
     }
   }
 
-  // console.log("copy after sorted: ", sorted.length);
+  console.log("copy after sorted: ", sorted.length);
 
   return sorted;
 }

@@ -38,6 +38,7 @@ export async function bucketStorage() {
 
   const bucket = storage.bucket(process.env.FIREBASE_storageBucket);
 
+  // set meta data for firebase bucket here...
   await bucket.setMetadata({
     cors: [
       {
