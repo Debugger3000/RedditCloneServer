@@ -61,7 +61,7 @@ const getPostsForThread = async (req, res) => {
     const postUsers = await generalUserHydration(posts);
     const hydratedPosts = hydratePostsWithUserImage(postUsers, posts);
 
-    console.log("hydrated posts: ", hydratedPosts);
+    // console.log("hydrated posts: ", hydratedPosts);
     res.status(200).json(hydratedPosts);
   } catch (error) {
     console.log("Error in post Create: ", error);
@@ -84,7 +84,7 @@ const getPosts = async (req, res) => {
 
     // check cache for data first before any DB calls
     const cached = await getCacheData(redisKey);
-    console.log("returned cached data before IF: ", cached);
+    console.log("returned cached data before IF: ");
     // console.log("length of cached: ", cached.length);
     if (cached && cached.length == limit) {
       console.log("We grabbed cached data !");
@@ -110,7 +110,7 @@ const getPosts = async (req, res) => {
       const cachedData = await setCacheData(redisKey, posts);
       console.log("We grabbed from DB, and set Cached data");
 
-      console.log("posts length: ", posts.length);
+      // console.log("posts length: ", posts.length);
 
       res.status(200).json(posts);
     }
