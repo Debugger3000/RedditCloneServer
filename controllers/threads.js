@@ -37,23 +37,33 @@ const editThread = async (req, res) => {
   try {
     const { title, bio, links, tags, threadImage, threadImagePath } = req.body;
 
-    const newThread = {
-      title: title,
-      bio: bio,
-      links: links,
-      tags: tags,
-      threadImage: threadImage,
-      threadImagePath: threadImagePath,
-    };
+    // grab old filePath if there is one...
+    const thread = await Thread.findById(req.params.id);
+    const filePath = thread.profileImagePath;
 
-    console.log("new ThreadObject: ", newThread);
+    // do we need to update image
+    // if so, we need to grab old path, delete from firebase and update accordingly...
+    if (filePath) {
+      try {
+        console.log("deleting from firebase storage...");
+        // give filePath to firebase delete function...
+        await deleteFirebaseImage(filePath);
+      } catch (error) {
+        console.log("error in firebase delete image call: ", error);
+      }
+    }
 
-    const thread = await Thread.findByIdAndUpdate(
-      req.params.id,
-      newThread
-    ).select("-threadImagePath");
+    thread.title = title;
+    thread.bio = bio;
+    thread.links = links;
+    thread.tags = tags;
+    thread.threadImage = threadImage;
+    thread.threadImagePath = threadImagePath;
 
-    res.status(200).json(thread);
+    await thread.save();
+    const { profileImagePath, ...cleanThread } = thread.toObject();
+
+    res.status(200).json(cleanThread);
   } catch (error) {
     console.log("Error in thread Create: ", error);
     res.status(500).json({ message: "Error in create thread controller" });

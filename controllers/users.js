@@ -141,16 +141,12 @@ const isAuthenticated = async (req, res) => {
       console.log("user object: ", req.user);
       // console.log("user object: ", req);
 
-      // const user = await User.findById(req.user._id);
+      // grab data when we check, cause data may have been updated...
+      const user = await User.findById(req.user._id).select(
+        "-profileImagePath"
+      );
 
-      res.status(200).json({
-        status: true,
-        _id: req.user._id,
-        username: req.user.username,
-        profileImage: req.user.profileImage,
-        votes: req.user.votes,
-        voteOnComments: req.user.voteOnComments,
-      });
+      res.status(200).json(user);
     } else {
       console.log("User auth status: Bad");
       res.status(404).json({ status: false, userId: null, username: null });
@@ -170,6 +166,8 @@ const editProfile = async (req, res) => {
       profileImagePath: profileImagePath,
     };
 
+    console.log("new user data from edit profile: ", newUser);
+
     // grab old filePath if there is one...
     const oldUser = await User.findById(req.params.id);
 
@@ -178,9 +176,9 @@ const editProfile = async (req, res) => {
 
     if (filePath) {
       try {
-        console.log("firebase storage: ", storage);
+        console.log("deleting from firebase storage...");
         // give filePath to firebase delete function...
-        deleteFirebaseImage(filePath);
+        await deleteFirebaseImage(filePath);
       } catch (error) {
         console.log("error in edit profile delete image: ", error);
       }
@@ -191,9 +189,11 @@ const editProfile = async (req, res) => {
     // console.log("deleted old profile image from firebase storage !");
 
     // update user profile
-    const user = await User.findByIdAndUpdate(req.params.id, newUser).select(
-      "-profileImagePath"
-    );
+    const user = await User.findByIdAndUpdate(req.params.id, newUser, {
+      new: true,
+    }).select("-profileImagePath");
+
+    console.log("new user object after update: ", user);
 
     res.status(200).json({ user });
   } catch (error) {

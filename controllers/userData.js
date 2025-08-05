@@ -117,6 +117,7 @@ async function findRecentThreadsSort(threadIdArray) {
   return sorted;
 }
 
+// route that sends back a signed url for client to upload an image to firebase storage
 const firebaseUpload = async (req, res) => {
   console.log("get user recent threads route hit");
   try {
@@ -149,16 +150,4 @@ const firebaseUpload = async (req, res) => {
   }
 };
 
-const skeleton = async (req, res) => {
-  console.log("skelly belly");
-  try {
-    res.status(200).json("test route...");
-  } catch (error) {
-    console.log("Error in get users recent threads: ", error);
-    res
-      .status(500)
-      .json({ message: "Error in get user recent threads controller" });
-  }
-};
-
-export { getUserRecentThreads, updateRecentThreads, firebaseUpload, skeleton };
+export { getUserRecentThreads, updateRecentThreads, firebaseUpload };
