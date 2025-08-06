@@ -197,6 +197,25 @@ const editProfile = async (req, res) => {
 
     res.status(200).json({ user });
   } catch (error) {
+    // if can error occurs in server side,
+    // then an image was uploaded but the data did not persist to DB for this image
+    // so we need to delete the data...
+    const { profileImagePath } = req.body;
+    if (profileImagePath) {
+      try {
+        console.log(
+          "error on edit profile in server. Deleting image that was uploaded to firebase, but did not persist into DB records for user."
+        );
+        // give filePath to firebase delete function...
+        await deleteFirebaseImage(profileImagePath);
+      } catch (error) {
+        console.log(
+          "Error for deleting profile image from firebase within caught error of normal flow...",
+          error
+        );
+      }
+    }
+
     console.log("Error in usersGet: ", error);
     res.status(500).json({ message: "Error in usersGet controller" });
   }
