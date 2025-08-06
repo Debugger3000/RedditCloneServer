@@ -83,12 +83,14 @@ const getPosts = async (req, res) => {
     const redisKey = `home:${page}:${feedType}`;
 
     // check cache for data first before any DB calls
-    const cached = await getCacheData(redisKey);
+    // const cached = await getCacheData(redisKey);
     console.log("returned cached data before IF: ");
     // console.log("length of cached: ", cached.length);
-    if (cached && cached.length == limit) {
+
+    // cached && cached.length == limit
+    if (false) {
       console.log("We grabbed cached data !");
-      res.status(200).json(cached); // ✅ Cache hit
+      res.status(200).json(cached);
     } else {
       // -1 by default so always grabbing latest...
       let sortVal = -1;

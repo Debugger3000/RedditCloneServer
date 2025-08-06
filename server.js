@@ -11,7 +11,7 @@ import cors from "cors";
 import passport from "./middleware/Authentication.js";
 
 // redis
-import { client } from "./middleware/redis.js";
+// import { client } from "./middleware/redis.js";
 
 // Routes import
 import userRouter from "./routes/user.js";
