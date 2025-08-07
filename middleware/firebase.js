@@ -27,6 +27,7 @@ export async function deleteFirebaseImage(path) {
   console.log("delete firebase image at path: ", path);
 }
 
+// get a bucket with headers set so we can send SIGNED URLS to client
 export async function bucketStorage() {
   const storage = new Storage({
     projectId: process.env.FIREBASE_PROJECT_ID,
