@@ -10,6 +10,7 @@ const threadSchemaObject = new mongoose.Schema(
     },
 
     // Main image for thread...
+    // this holds the exposed url to my own secure endpoint to secure image reads
     threadImage: {
       type: String,
       default: "",

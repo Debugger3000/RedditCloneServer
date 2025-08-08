@@ -1,4 +1,9 @@
 import { Thread } from "../models/threads.js";
+import {
+  imageStorageUpload,
+  deleteImageStorage,
+  deleteFirebaseImage,
+} from "../middleware/firebase.js";
 
 const createThread = async (req, res) => {
   console.log("Create thread route hit");
@@ -6,13 +11,18 @@ const createThread = async (req, res) => {
   try {
     const { title, bio, links, tags, username, threadImage, threadImagePath } =
       req.body;
+
+    // thread Image is imageType
+
     const thread = new Thread({
       title: title,
       bio: bio,
       links: links,
       tags: tags,
-      threadImage: threadImage,
-      threadImagePath: threadImagePath,
+      threadImage: threadImagePath
+        ? await imageStorageUpload(threadImage, threadImagePath)
+        : undefined,
+      // threadImagePath: threadImagePath,
       followers: [req.user._id],
       followersCount: 1,
       owner: username,
@@ -37,17 +47,37 @@ const editThread = async (req, res) => {
   try {
     const { title, bio, links, tags, threadImage, threadImagePath } = req.body;
 
-    // grab old filePath if there is one...
+    // grab thread document
     const thread = await Thread.findById(req.params.id);
-    const filePath = thread.profileImagePath;
 
     // do we need to update image
-    // if so, we need to grab old path, delete from firebase and update accordingly...
-    if (filePath) {
+    // check if there is a new image upload...
+    if (threadImagePath) {
+      // grab old image exposed url
+      // grab old filePath if there is one...
       try {
-        console.log("deleting from firebase storage...");
-        // give filePath to firebase delete function...
-        await deleteFirebaseImage(filePath);
+        const threadImageExposedUrl = thread.threadImage;
+
+        // check if there is an existing image url
+        if (threadImageExposedUrl) {
+          // return filePAth of old image in Imagestorage document
+          const oldImageFirebasePath = await deleteImageStorage(
+            threadImageExposedUrl
+          );
+          console.log("deleted image storage document: ", oldImageFirebasePath);
+
+          console.log("deleting from firebase storage...");
+          // give filePath to firebase delete function...
+          await deleteFirebaseImage(oldImageFirebasePath);
+        }
+
+        // upload new image
+        const newExposedImageUrl = await imageStorageUpload(
+          threadImage,
+          threadImagePath
+        );
+        // set new image to new thread based on update
+        thread.threadImage = newExposedImageUrl;
       } catch (error) {
         console.log("error in firebase delete image call: ", error);
       }
@@ -57,11 +87,9 @@ const editThread = async (req, res) => {
     thread.bio = bio;
     thread.links = links;
     thread.tags = tags;
-    thread.threadImage = threadImage;
-    thread.threadImagePath = threadImagePath;
 
     await thread.save();
-    const { profileImagePath, ...cleanThread } = thread.toObject();
+    const { ...cleanThread } = thread.toObject();
 
     res.status(200).json(cleanThread);
   } catch (error) {
