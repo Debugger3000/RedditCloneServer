@@ -4,7 +4,7 @@ import {
 } from "../middleware/hydration/postHydration.js";
 import { Post } from "../models/posts.js";
 import { User } from "../models/users.js";
-import { getCacheData, setCacheData } from "../middleware/redis.js";
+import { getCacheData, setCacheData, client } from "../middleware/redis.js";
 
 const createPost = async (req, res) => {
   console.log("Create Post route hit");
@@ -84,7 +84,7 @@ const getPosts = async (req, res) => {
 
     // check cache for data first before any DB calls
     const cached = await getCacheData(redisKey);
-    console.log("returned cached data before IF: ");
+    console.log("returned cached data before IF: ", cached);
     // console.log("length of cached: ", cached.length);
 
     //
@@ -97,7 +97,7 @@ const getPosts = async (req, res) => {
       if (feedType === "oldest") {
         sortVal = 1;
       }
-      console.log("feedStype: ", sortVal);
+      // console.log("feedStype: ", sortVal);
       // console.log("limit is now: ", limit);
       // console.log("page before is now: ", page);
       const skip = (page - 1) * 5;
@@ -110,7 +110,10 @@ const getPosts = async (req, res) => {
 
       // set cache data for posts return
       const cachedData = await setCacheData(redisKey, posts);
-      console.log("We grabbed from DB, and set Cached data");
+      // console.log("We grabbed from DB, and set Cached data", cachedData);
+
+      // const keys = await client.keys("*"); // be cautious with this on large DBs
+      // console.log("Keys in redis currently:", keys);
 
       // console.log("posts length: ", posts.length);
 
