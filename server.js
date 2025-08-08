@@ -24,6 +24,7 @@ import userDataRouter from "./routes/userData.js";
 // -----------------
 // Set environment files based on script start
 dotenv.config({ path: `./.env.${process.env.NODE_ENV}` });
+dotenv.config({ path: "./.env.local" });
 // log out environment type
 console.log("Environment: ", process.env.NODE_ENV);
 console.log("origin: ", process.env.ORIGIN);
