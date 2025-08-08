@@ -10,7 +10,7 @@ function getRedisUrl() {
   } else {
     console.log(
       "prod redis url: ",
-      `redis://:${process.env.REDIS_USERNAME}:${process.env.REDIS_PASSWORD}@${process.env.REDIS_ENDPOINT}`
+      `redis://${process.env.REDIS_USERNAME}:${process.env.REDIS_PASSWORD}@${process.env.REDIS_ENDPOINT}`
     );
     return `redis://:${process.env.REDIS_USERNAME}:${process.env.REDIS_PASSWORD}@${process.env.REDIS_ENDPOINT}`;
   }
