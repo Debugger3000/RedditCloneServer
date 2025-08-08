@@ -1,6 +1,7 @@
 import { UserData } from "../models/userData.js";
 import { Thread } from "../models/threads.js";
 import { bucketStorage } from "../middleware/firebase.js";
+import { ImageStorage } from "../models/imageUrlStorage.js";
 
 const getUserRecentThreads = async (req, res) => {
   console.log("get user recent threads route hit");
@@ -122,12 +123,13 @@ const firebaseUpload = async (req, res) => {
   console.log("get user recent threads route hit");
   try {
     // const fileName = req.params.fileName;
-    const fileName = req.query.fileName;
+    // this is actually 'filePath'
+    const filePath = req.query.filePath;
     const fileType = req.query.fileType;
     console.log("file type here: ", fileType);
 
     const bucket = await bucketStorage();
-    const file = bucket.file(fileName);
+    const file = bucket.file(filePath);
 
     const [url] = await file.getSignedUrl({
       version: "v4",
@@ -138,6 +140,10 @@ const firebaseUpload = async (req, res) => {
 
     console.log("signed url: ", url);
     if (url) {
+      // if signed url is good, then create image storage document before returning url.
+      // call firebase storage upload...
+      // await imageStorageUpload(fileType, filePath);
+
       res.status(200).json(url);
     } else {
       res.status(200).json(null);
@@ -150,4 +156,49 @@ const firebaseUpload = async (req, res) => {
   }
 };
 
-export { getUserRecentThreads, updateRecentThreads, firebaseUpload };
+const imageStorageUpload = async (req, res) => {
+  console.log("getting image from secure storage route hit");
+  try {
+    const id = req.params.id;
+
+    // search for image document
+    const imageDocument = await ImageStorage.findById(id);
+
+    if (imageDocument && req.user) {
+      // get path, set up stream...
+      const bucket = await bucketStorage();
+      const file = bucket.file(imageDocument.imagePath);
+
+      const [metaData] = await file.getMetadata();
+      const contentType = metaData.contentType;
+
+      res.setHeader("Content-Type", contentType);
+
+      // Stream the image
+      const readStream = file.createReadStream();
+
+      // make sure stream is okay
+      readStream.on("error", (err) => {
+        console.error("Error streaming image from firebase:", err);
+        res.sendStatus(404);
+      });
+
+      // pipe data to the browser from firebase
+      readStream.pipe(res);
+    }
+
+    // res.status(200).json(url);
+  } catch (error) {
+    console.log("Error in get image from storage / firebase...", error);
+    res
+      .status(500)
+      .json({ message: "Error in get image from storage / firebase..." });
+  }
+};
+
+export {
+  getUserRecentThreads,
+  updateRecentThreads,
+  firebaseUpload,
+  imageStorageUpload,
+};

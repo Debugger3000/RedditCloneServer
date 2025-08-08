@@ -17,6 +17,7 @@ const userSchemaObject = {
     required: true,
   },
   // Main image for user...
+  // exposed url to my endpoint for profile image
   profileImage: {
     type: String,
     default: "",

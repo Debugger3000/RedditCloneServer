@@ -1,7 +1,12 @@
 import { User } from "../models/users.js";
 import passport from "passport";
 import { deleteObject, ref } from "firebase/storage";
-import { deleteFirebaseImage, storage } from "../middleware/firebase.js";
+import {
+  deleteFirebaseImage,
+  deleteImageStorage,
+  storage,
+  imageStorageUpload,
+} from "../middleware/firebase.js";
 
 // controllers
 // ----------------------------------------
@@ -160,42 +165,41 @@ const isAuthenticated = async (req, res) => {
 const editProfile = async (req, res) => {
   console.log("edit profile route /api/user has been hit");
   try {
+    // profileImage is imageType
     const { profileImage, profileImagePath } = req.body;
-    const newUser = {
-      profileImage: profileImage,
-      profileImagePath: profileImagePath,
-    };
 
-    console.log("new user data from edit profile: ", newUser);
+    // profileImage is imageType
 
     // grab old filePath if there is one...
     const oldUser = await User.findById(req.params.id);
 
-    const filePath = oldUser.profileImagePath;
-    console.log("old user image file path: ", filePath);
+    const oldImageUrl = oldUser.profileImage;
 
-    if (filePath) {
+    // if old image url exists then delete relevant files
+    if (oldImageUrl) {
       try {
+        const oldImageFirebasePath = await deleteImageStorage(oldImageUrl);
+        console.log("deleted image storage document: ", oldImageFirebasePath);
+
         console.log("deleting from firebase storage...");
         // give filePath to firebase delete function...
-        await deleteFirebaseImage(filePath);
+        await deleteFirebaseImage(oldImageFirebasePath);
       } catch (error) {
         console.log("error in edit profile delete image: ", error);
       }
     }
-    // delete users old image from firebase since we changed it and dont need it
 
-    // await deleteObject(refer);
-    // console.log("deleted old profile image from firebase storage !");
+    const newExposedImageUrl = await imageStorageUpload(
+      profileImage,
+      profileImagePath
+    );
 
-    // update user profile
-    const user = await User.findByIdAndUpdate(req.params.id, newUser, {
-      new: true,
-    }).select("-profileImagePath");
+    oldUser.profileImage = newExposedImageUrl;
+    await oldUser.save();
+    const { ...cleanUser } = oldUser.toObject();
+    console.log("new user object after update: ", cleanUser);
 
-    console.log("new user object after update: ", user);
-
-    res.status(200).json({ user });
+    res.status(200).json({ cleanUser });
   } catch (error) {
     // if can error occurs in server side,
     // then an image was uploaded but the data did not persist to DB for this image
