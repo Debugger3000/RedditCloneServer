@@ -5,7 +5,7 @@ import { Storage } from "@google-cloud/storage";
 
 function getFirebaseStorage() {
   const storage = {
-    apiKey: process.env.FIREBASE_apiKey,
+    apiKey: process.env.FIREBASE_APIKEY,
     authDomain: process.env.FIREBASE_authDomain,
     projectId: process.env.FIREBASE_projectId,
     storageBucket: process.env.FIREBASE_storageBucket,

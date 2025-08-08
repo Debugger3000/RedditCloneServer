@@ -1,8 +1,24 @@
 import { createClient } from "redis";
 
+// redis://default:<PASSWORD>@redis-18706.c73.us-east-1-2.ec2.redns.redis-cloud.com:18706
+
+// handle redis url logic for dev vs prod
+function getRedisUrl() {
+  if (process.env.ENVIRONMENT_TYPE == "development") {
+    console.log("dev redis url: ", "redis://" + process.env.REDIS_URL);
+    return "redis://" + process.env.REDIS_URL;
+  } else {
+    console.log(
+      "prod redis url: ",
+      `redis://:${process.env.REDIS_USERNAME}:${process.env.REDIS_PASSWORD}@${REDIS_ENDPOINT}`
+    );
+    return `redis://:${process.env.REDIS_USERNAME}:${process.env.REDIS_PASSWORD}@${REDIS_ENDPOINT}`;
+  }
+}
+
 // create redis client instance for server to utilize...
 export const client = await createClient({
-  url: process.env.REDIS_URL,
+  url: getRedisUrl(),
 })
   .on("error", (err) => console.log("Redis Client Error", err))
   .on("ready", () => {
