@@ -19,6 +19,7 @@ router.get("/", getComments);
 router.get("/:id", getCommentsByPost);
 router.post("/vote", commentVote);
 router.delete("/:id", deleteComment);
+// id given by req body for some reason lol
 router.put("/", editComment);
 
 export default router;
