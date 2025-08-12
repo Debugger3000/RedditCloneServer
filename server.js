@@ -9,6 +9,7 @@ import dotenv from "dotenv";
 import cors from "cors";
 
 import passport from "./middleware/Authentication.js";
+import { checkUserIdentityResourceLimiter } from "./middleware/resourceLimiter.js";
 
 // redis
 // import { client } from "./middleware/redis.js";
@@ -94,6 +95,9 @@ mongoose
   .catch((err) => {
     console.log("Error:", err);
   });
+
+// run resource tracking middleware
+app.use(checkUserIdentityResourceLimiter);
 
 // Routes
 app.use("/api/user", userRouter);
