@@ -2,6 +2,7 @@ import passport from "passport";
 import LocalStrategy from "passport-local";
 import encrypt from "bcrypt";
 import { User } from "../models/users.js";
+import { TestUserResourceTracker } from "../models/testUserResourceTracker.js";
 import GitHubStrategy from "passport-github";
 import axios from "axios";
 
@@ -125,11 +126,32 @@ passport.use(
 
         let user = new User({
           email: email,
-          username: req.body.username,
+          username: username,
           password: hashedPassword,
         });
         // commit data to DB
         await user.save();
+
+        console.log(
+          "starts with username status: ",
+          username.startsWith("testUser")
+        );
+
+        // check if username falls within REGEX for a testUser account...
+        if (username.startsWith("testUser")) {
+          console.log("test User detected. Creating proper resource tracker.");
+          // this is a test User so we need to create a resource tracker document for it
+          let testUserResourceTrackDocument = new TestUserResourceTracker({
+            testUserId: user._id,
+          });
+
+          await testUserResourceTrackDocument.save();
+
+          console.log(
+            "Test users resource tracker document: ",
+            testUserResourceTrackDocument
+          );
+        }
 
         return done(null, user, { status: true, email: 1, username: 1 });
 

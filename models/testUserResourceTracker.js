@@ -3,10 +3,9 @@ import mongoose from "mongoose";
 
 const testUserResourceTrackerSchemaObject = new mongoose.Schema(
   {
-    firebaseUploads: {
-      type: Number,
+    testUserId: {
+      type: String,
       required: true,
-      default: 0,
     },
 
     // COMMENTS resources

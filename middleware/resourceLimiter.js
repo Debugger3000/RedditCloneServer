@@ -15,8 +15,38 @@ const COOKIE_MAX_AGE = 3 * 24 * 60 * 60 * 1000; // 3 days
 
 // -------------------------------------
 // Check user identity, if testUser then we need to check resource tracker document to enforce limits...
-const limit = 3;
-const deleteLimit = 2;
+const limit = 2;
+
+const paths = {
+  "/api/comments": {
+    POST: "postComment",
+    PUT: "putComment",
+    DELETE: "deleteComment",
+  },
+  "/api/post": {
+    POST: "postPost",
+  },
+  "/api/threads": {
+    POST: "postThread",
+    PATCH: "patchThread",
+  },
+  "/api/user/edit-profile": {
+    POST: "postProfile",
+  },
+};
+
+function findMatch(fullPath, method) {
+  // 1. Look for the first key that is contained in the fullPath string
+  const matchedKey = Object.keys(paths).find((key) => fullPath.includes(key));
+
+  if (matchedKey) {
+    // 2. Check if the method exists for that key
+    if (paths[matchedKey][method]) {
+      return paths[matchedKey][method];
+    }
+  }
+  return null;
+}
 
 // multiple people using this account. Will the limits be enough for daily use ?
 //  should I have two test User accounts ?
@@ -24,64 +54,57 @@ const deleteLimit = 2;
 export async function checkUserIdentityResourceLimiter(req, res, next) {
   // we want to avoid any GET / read routes
 
+  console.log("Checking for resource limiter");
+
+  const path = req.path;
+  const method = req.method;
+
+  if (path.includes("vote") || path.includes("join") || method === "GET") {
+    console.log("path contains join or vote, so go next. Or path is a GET.");
+    return next();
+  }
+
+  // check for string match in our path object
+  const resultField = findMatch(path, method);
+  // console.log("result field is: ", resultField);
+
   // if a user exists
-  if (req.user && req.method != "GET") {
+  if (resultField) {
+    console.log("Resource limiter running");
+    // console.log("req user ", req.user);
+    // console.log("Path: ", req.path);
+
+    const user_id = req.user._id;
+
     // check if user id is the same as testUser documents id
-    const testUser = await TestUserResourceTracker.findById(req.user._id);
+    const testUser = await TestUserResourceTracker.findOne({
+      testUserId: user_id,
+    });
+
+    console.log("test user: ", testUser);
+    // if TestUser is null or empty, then we need to go next
+    if (!testUser) {
+      return next();
+    }
 
     // check if its a new day, to reset all the values to zero before trying to increment or check values
     const resourceDocument = await checkResetDate(testUser);
 
-    const path = req.path;
-    const method = req.method;
+    // console.log("check reset returned doc value: ", resourceDocument);
 
-    // field to increment variable
-    let fieldToIncrement = "";
+    // console.log("Path for route just hit: ", path);
+    // console.log("Method for route just hit: ", method);
 
-    console.log("Path for route just hit: ", path);
-    console.log("Method for route just hit: ", method);
-
-    //   COMMENTS
-    if (path.startsWith("/api/comment")) {
-      if (method === "POST") {
-        //   POST - create comment route - '/api/comment'
-        fieldToIncrement = "postComment";
-      } else if (method === "PUT") {
-        //   PUT - edit comment route - '/api/comment'
-        fieldToIncrement = "putComment";
-      } else if (method === "DELETE") {
-        //   DELETE - delete a comment route - '/api/comment/:id'
-        fieldToIncrement = "deleteComment";
-      }
-    }
-    //   POSTS
-    else if (path.startsWith("/api/post")) {
-      if (method === "POST") {
-        //   POST - create post route - '/api/post'
-        fieldToIncrement = "postPost";
-      }
-    }
-    // THREADS
-    else if (path.startsWith("/api/thread")) {
-      if (method === "POST") {
-        //   POST - create thread route - '/api/thread'
-        fieldToIncrement = "postThread";
-      } else if (method === "PATCH") {
-        //   PATCH - edit thread route - '/api/thread/:id'
-        fieldToIncrement = "patchThread";
-      }
-    }
-    //   PROFILE
-    else if (path.startsWith("/api/user/edit-profile")) {
-      //   edit profile route - '/api/user/edit-profile/:id'
-      fieldToIncrement = "postProfile";
-    }
-
-    // logic with returned result of increment
+    // logic with returned result of increment on some field in resource Document
     const result = await incrementSomeResource(
       resourceDocument,
-      fieldToIncrement
+      resultField,
+      user_id
     );
+    console.log("result of increment logic: ", result);
+
+    // check return status of increment function
+    // we do this B/C we have to return from within this function...
     if (!result.status && result.message.length > 0) {
       return res.status(404).json({
         status: false,
@@ -103,13 +126,15 @@ export async function checkUserIdentityResourceLimiter(req, res, next) {
 
 // increment the given document for whatever field...
 // reset all or increment a field
-async function incrementSomeResource(resourceDocument, type) {
+async function incrementSomeResource(resourceDocument, type, user_id) {
   // match type with key field of the document
-  const incrementField = {};
-  for (const [key, value] of Object.entries(resourceDocument)) {
+
+  const doc = resourceDocument.toObject();
+  for (const key in doc) {
     if (key === type) {
+      const value = doc[key];
       if (value < limit) {
-        incrementField[key] = value + 1;
+        console.log("added field to increment field, ", type);
         break;
       }
       // limit is already reached...
@@ -121,26 +146,27 @@ async function incrementSomeResource(resourceDocument, type) {
       }
     }
   }
-
-  const updatedDoc = await collection.findOneAndUpdate(
-    { _id: new ObjectId(id) },
-    { $set: incrementField }
+  const updatedDoc = await TestUserResourceTracker.findOneAndUpdate(
+    { testUserId: user_id },
+    { $inc: { [type]: 1 } },
+    { returnDocument: "after" } // returns the updated document
   );
 
-  if (updatedDoc.ok) {
+  // console.log("updated doc after increment: ", updatedDoc);
+
+  if (updatedDoc) {
     console.log(`Successfully increment resource limiter for field: ${type}`);
-    return { status: true, message: "" };
+    return { status: true, message: `Successful increment for ${type}` };
   } else {
     return { status: false, message: "" };
   }
 }
 
 async function resetResourceFields(id) {
-  const newResetDoc = await collection.findOneAndUpdate(
-    { _id: new ObjectId(id) },
+  const newResetDoc = await TestUserResourceTracker.findOneAndUpdate(
+    { testUserId: id.toString() },
     {
       $set: {
-        firebaseUploads: 0,
         postComment: 0,
         putComment: 0,
         deleteComment: 0,
