@@ -27,7 +27,9 @@ import userDataRouter from "./routes/userData.js";
 dotenv.config({ path: `./.env.${process.env.NODE_ENV}` });
 dotenv.config({ path: "./.env.local" });
 // log out environment type
-console.log("Environment: ", process.env.NODE_ENV);
+const environment = process.env.ENVIRONMENT_TYPE;
+console.log("Environment: ", environment);
+console.log("evnrionment strict var: ", environment);
 console.log("origin: ", process.env.ORIGIN);
 
 // general variables
@@ -46,6 +48,11 @@ app.use(
   })
 );
 
+// set proxy for render to trust cookies being sent
+if (process.env.ENVIRONMENT_TYPE === "production") {
+  app.set("trust proxy", 1);
+}
+
 // Sessions
 const sessionObject = {
   store: connectMongo.create({
@@ -58,13 +65,16 @@ const sessionObject = {
   secret: "fakeSecret",
   saveUninitialized: false,
   resave: false,
-  // sameSite: 'none',
-  // secure: true,
-  // // httpOnly: true,
+
+  //
+  // //
   // partitioned: true,
+  //  secure: process.env.ENVIRONMENT_TYPE === "production",
 
   cookie: {
-    httpOnly: false,
+    secure: environment === "production",
+    sameSite: environment === "production" ? "none" : "lax",
+    httpOnly: true, //lets browser/client access cookie via Document object
     maxAge: 3600000,
   },
 };
