@@ -7,26 +7,30 @@ const getUserRecentThreads = async (req, res) => {
   console.log("get user recent threads route hit");
   try {
     // get userData schema object
-    const userData = await UserData.findOne({ userId: req.user._id });
+    if (req.user) {
+      const userData = await UserData.findOne({ userId: req.user._id });
 
-    // console.log("userData document in get Recent: ", userData);
+      // console.log("userData document in get Recent: ", userData);
 
-    // go through array, and grab each thread in order
-    // send array, return sorted threads...
-    if (!userData || userData.length == 0) {
-      const newUserData = new UserData({
-        userId: req.user._id,
-      });
+      // go through array, and grab each thread in order
+      // send array, return sorted threads...
+      if (!userData || userData.length == 0) {
+        const newUserData = new UserData({
+          userId: req.user._id,
+        });
 
-      await newUserData.save();
+        await newUserData.save();
 
-      res.status(200).json({ threadList: [] });
+        res.status(200).json({ threadList: [] });
+      } else {
+        // console.log("userData in get Recent: ", userData.recentThreads);
+        const sortedThreads = await findRecentThreadsSort(
+          userData.recentThreads.threadIdList
+        );
+        res.status(200).json(sortedThreads);
+      }
     } else {
-      // console.log("userData in get Recent: ", userData.recentThreads);
-      const sortedThreads = await findRecentThreadsSort(
-        userData.recentThreads.threadIdList
-      );
-      res.status(200).json(sortedThreads);
+      res.status(200).json({ threadList: [] });
     }
 
     console.log("----------------------------------------------");

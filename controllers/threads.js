@@ -222,9 +222,13 @@ const getThreadsByUser = async (req, res) => {
   console.log("get threads for user.....");
   console.log("SIDE PANEL USER ----------------------------------");
   try {
-    console.log("USER THREAD OBJ: ", req.user._id);
-    const thread = await Thread.find({ followers: { $in: [req.user._id] } });
-    res.status(200).json(thread);
+    // console.log("USER THREAD OBJ: ", req.user._id);
+    if (req.user) {
+      const thread = await Thread.find({ followers: { $in: [req.user._id] } });
+      return res.status(200).json(thread);
+    } else {
+      return res.status(500).json([]);
+    }
   } catch (error) {
     console.log("Error in get thread by user: ", error);
     res.status(500).json({ message: "Error in delete threads controller" });
