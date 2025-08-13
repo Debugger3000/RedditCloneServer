@@ -84,7 +84,7 @@ const getPosts = async (req, res) => {
 
     // check cache for data first before any DB calls
     const cached = await getCacheData(redisKey);
-    console.log("returned cached data before IF: ", cached);
+    // console.log("returned cached data before IF: ", cached);
     // console.log("length of cached: ", cached.length);
 
     //

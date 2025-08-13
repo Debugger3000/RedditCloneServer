@@ -88,7 +88,7 @@ export async function checkUserIdentityResourceLimiter(req, res, next) {
     }
 
     // check if its a new day, to reset all the values to zero before trying to increment or check values
-    const resourceDocument = await checkResetDate(testUser);
+    const resourceDocument = await checkResetDate(testUser, user_id);
 
     // console.log("check reset returned doc value: ", resourceDocument);
 
@@ -164,7 +164,7 @@ async function incrementSomeResource(resourceDocument, type, user_id) {
 
 async function resetResourceFields(id) {
   const newResetDoc = await TestUserResourceTracker.findOneAndUpdate(
-    { testUserId: id.toString() },
+    { testUserId: id },
     {
       $set: {
         postComment: 0,
@@ -178,28 +178,29 @@ async function resetResourceFields(id) {
     },
     { returnDocument: "after" } // returns the updated document
   );
+  console.log("A resource limit document has been reset");
   return newResetDoc;
 }
 
 // checks whether the given document can be reset
 // RETURNS - new updated document with fields reset or document that it was given
-async function checkResetDate(resourceDocument) {
+async function checkResetDate(resourceDocument, user_id) {
   const updated = new Date(resourceDocument.updatedAt);
   const curDate = new Date();
 
   if (updated.getFullYear() < curDate.getFullYear()) {
     // year ahead reset fields
-    return await resetResourceFields(resourceDocument._id);
+    return await resetResourceFields(user_id);
   } else {
     // month is ahead, reset
     if (updated.getMonth() < curDate.getMonth()) {
-      return await resetResourceFields(resourceDocument._id);
+      return await resetResourceFields(user_id);
     }
     // check days now...
     else {
       if (updated.getDate() < curDate.getDate()) {
         // day is ahead, reset
-        return await resetResourceFields(resourceDocument._id);
+        return await resetResourceFields(user_id);
       } else {
         return resourceDocument;
       }
