@@ -156,6 +156,8 @@ const firebaseUpload = async (req, res) => {
   }
 };
 
+// Access point for all images on web app.
+// Stream image data from firebase to client res object from here
 const imageStorageUpload = async (req, res) => {
   console.log("getting image from secure storage route hit");
   try {

@@ -6,6 +6,7 @@ import {
   deleteImageStorage,
   storage,
   imageStorageUpload,
+  deleteImageStores,
 } from "../middleware/firebase.js";
 
 // controllers
@@ -143,7 +144,7 @@ const isAuthenticated = async (req, res) => {
     console.log("Checking user auth has been hit");
     if (req.user) {
       console.log("User auth status: Good");
-      console.log("user object: ", req.user);
+      // console.log("user object: ", req.user);
       // console.log("user object: ", req);
 
       // grab data when we check, cause data may have been updated...
@@ -164,6 +165,9 @@ const isAuthenticated = async (req, res) => {
 
 const editProfile = async (req, res) => {
   console.log("edit profile route /api/user has been hit");
+  let newExposedUrlFailure = "";
+  let isDocUpdateSuccessful = false;
+  let isImageStorageSuccessful = false;
   try {
     // profileImage is imageType
     const { profileImage, profileImagePath } = req.body;
@@ -175,53 +179,52 @@ const editProfile = async (req, res) => {
 
     const oldImageUrl = oldUser.profileImage;
 
-    // if old image url exists then delete relevant files
-    if (oldImageUrl) {
-      try {
-        const oldImageFirebasePath = await deleteImageStorage(oldImageUrl);
-        console.log("deleted image storage document: ", oldImageFirebasePath);
-
-        console.log("deleting from firebase storage...");
-        // give filePath to firebase delete function...
-        await deleteFirebaseImage(oldImageFirebasePath);
-      } catch (error) {
-        console.log("error in edit profile delete image: ", error);
-      }
-    }
-
+    // -------------------
+    // UPload new image first
+    // profileImage is imageType (jpg/gif/etc...)
     const newExposedImageUrl = await imageStorageUpload(
       profileImage,
       profileImagePath
     );
 
-    oldUser.profileImage = newExposedImageUrl;
-    await oldUser.save();
-    const { ...cleanUser } = oldUser.toObject();
-    console.log("new user object after update: ", cleanUser);
+    // if DB image storage document fails, we need to delete firebase image and return 500
+    if (!newExposedImageUrl) {
+      // firebase delete
+      await deleteFirebaseImage(profileImagePath);
+      return res.status(500).json({
+        message: "Error in edit profile, imageStorageUpload",
+      });
+    } else {
+      // set this in case of failure
+      isImageStorageSuccessful = true;
+      newExposedUrlFailure = newExposedImageUrl;
+      oldUser.profileImage = newExposedImageUrl;
+    }
 
-    res.status(200).json({ cleanUser });
+    await oldUser.save();
+    // check flag so we know user data was updated successfully
+    isDocUpdateSuccessful = true;
+
+    // ------------
+    // Delete old data after new data was created successfully
+    // if old image url exists then delete relevant files
+    if (oldImageUrl) {
+      await deleteImageStores(oldImageUrl);
+    }
+
+    res.status(200).json(oldUser);
   } catch (error) {
-    // if can error occurs in server side,
-    // then an image was uploaded but the data did not persist to DB for this image
-    // so we need to delete the data...
-    const { profileImagePath } = req.body;
-    if (profileImagePath) {
-      try {
-        console.log(
-          "error on edit profile in server. Deleting image that was uploaded to firebase, but did not persist into DB records for user."
-        );
-        // give filePath to firebase delete function...
-        await deleteFirebaseImage(profileImagePath);
-      } catch (error) {
-        console.log(
-          "Error for deleting profile image from firebase within caught error of normal flow...",
-          error
-        );
-      }
+    // If data didnt persist onto user profile, then we delete firebase / mongo image records...
+    if (!isImageStorageSuccessful) {
+      await deleteFirebaseImage(threadImagePath);
+    }
+    // we need to delete both image stores (firebase and mongodb imageStore document)
+    else if (!isDocUpdateSuccessful) {
+      await deleteImageStores(newExposedUrlFailure);
     }
 
     console.log("Error in usersGet: ", error);
-    res.status(500).json({ message: "Error in usersGet controller" });
+    res.status(500).json({ message: "Error in edit profile controller" });
   }
 };
 

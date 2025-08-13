@@ -32,16 +32,20 @@ export async function deleteFirebaseImage(path) {
 // we need to control firebase url READ access, so this creates our documents for that model
 export async function imageStorageUpload(imageType, imagePath) {
   // create new image storage model...
-  const imageStorage = new ImageStorage({
-    imageType: imageType,
-    imagePath: imagePath,
-  });
+  try {
+    const imageStorage = new ImageStorage({
+      imageType: imageType,
+      imagePath: imagePath,
+    });
 
-  imageStorage.exposedUrl = `/api/userData/images/get/${imageStorage._id}`;
+    imageStorage.exposedUrl = `/api/userData/images/get/${imageStorage._id}`;
 
-  await imageStorage.save();
+    await imageStorage.save();
 
-  return `/api/userData/images/get/${imageStorage._id}`;
+    return `/api/userData/images/get/${imageStorage._id}`;
+  } catch (error) {
+    return null;
+  }
 }
 
 // delete image storage based on imagePath
@@ -52,18 +56,33 @@ export async function deleteImageStorage(imageExposedUrl) {
     exposedUrl: imageExposedUrl,
   });
 
-  // if (imageDocument) {
-  //   await imageDocument.deleteOne();
-  // }
-
-  // const all = await ImageStorage.find();
   // console.log("ALL image docs: ", all);
+  if (imageDocument) {
+    return imageDocument.imagePath;
+  } else {
+    return null;
+  }
 
   console.log("imagedocument: ", imageDocument);
   // return old imagePath so we can delete from firebase next...
-  return imageDocument.imagePath;
 }
 
+// general delete function for images
+// deletes both firebase and mongoDB image storage documents
+export async function deleteImageStores(exposedUrl) {
+  try {
+    const oldImageFirebasePath = await deleteImageStorage(exposedUrl);
+    console.log("Deleted image storage document", oldImageFirebasePath);
+
+    // give filePath to firebase delete function...
+    await deleteFirebaseImage(oldImageFirebasePath);
+    console.log("Deleted from firebase storage");
+  } catch (error) {
+    console.log("error in deleteImage Stores, firebase middleware", error);
+  }
+}
+
+// --------------------
 // get a bucket with headers set so we can send SIGNED URLS to client
 export async function bucketStorage() {
   const storage = new Storage({

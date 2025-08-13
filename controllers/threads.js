@@ -3,25 +3,44 @@ import {
   imageStorageUpload,
   deleteImageStorage,
   deleteFirebaseImage,
+  deleteImageStores,
 } from "../middleware/firebase.js";
 
 const createThread = async (req, res) => {
   console.log("Create thread route hit");
   console.log("----------------------------");
+
+  let newExposedUrlFailure = "";
+  let isImageStorageSuccessful = false;
+  let isDocUpdateSuccessful = false;
+
   try {
     const { title, bio, links, tags, username, threadImage, threadImagePath } =
       req.body;
 
     // thread Image is imageType
+    const newExposedUrl = await imageStorageUpload(
+      threadImage,
+      threadImagePath
+    );
+
+    // if null, we need to delete firebase image
+    if (!newExposedUrl) {
+      await deleteFirebaseImage(threadImagePath);
+      return res
+        .status(500)
+        .json({ message: "Error in create thread, create imageStorageUpload" });
+    } else {
+      isImageStorageSuccessful = true;
+      newExposedUrlFailure = newExposedUrl;
+    }
 
     const thread = new Thread({
       title: title,
       bio: bio,
       links: links,
       tags: tags,
-      threadImage: threadImagePath
-        ? await imageStorageUpload(threadImage, threadImagePath)
-        : undefined,
+      threadImage: newExposedUrl,
       // threadImagePath: threadImagePath,
       followers: [req.user._id],
       followersCount: 1,
@@ -29,14 +48,19 @@ const createThread = async (req, res) => {
     });
     console.log("new thread object: ", thread);
     await thread.save();
+    isDocUpdateSuccessful = true;
 
-    // grab new thead, without theadImagePath
-    const returnThread = await Thread.findById(thread._id).select(
-      "-threadImagePath"
-    );
-
-    res.status(200).json(returnThread);
+    res.status(200).json(thread.toObject());
   } catch (error) {
+    const { threadImagePath } = req.body;
+    // we only need to delete firebase cause imageStore document not created
+    if (!isImageStorageSuccessful) {
+      await deleteFirebaseImage(threadImagePath);
+    }
+    // we need to delete both image stores (firebase and mongodb imageStore document)
+    else if (!isDocUpdateSuccessful) {
+      await deleteImageStores(newExposedUrlFailure);
+    }
     console.log("Error in thread Create: ", error);
     res.status(500).json({ message: "Error in create thread controller" });
   }
@@ -44,6 +68,9 @@ const createThread = async (req, res) => {
 
 const editThread = async (req, res) => {
   console.log("Edit thread route hit");
+  let newExposedUrlFailure = "";
+  let isImageStorageSuccessful = false;
+  let isDocUpdateSuccessful = false;
   try {
     const { title, bio, links, tags, threadImage, threadImagePath } = req.body;
 
@@ -58,17 +85,10 @@ const editThread = async (req, res) => {
       try {
         const threadImageExposedUrl = thread.threadImage;
 
-        // check if there is an existing image url
+        // check if there is an existing image url to delete old image files
         if (threadImageExposedUrl) {
-          // return filePAth of old image in Imagestorage document
-          const oldImageFirebasePath = await deleteImageStorage(
-            threadImageExposedUrl
-          );
-          console.log("deleted image storage document: ", oldImageFirebasePath);
-
-          console.log("deleting from firebase storage...");
-          // give filePath to firebase delete function...
-          await deleteFirebaseImage(oldImageFirebasePath);
+          // delete old images (firebase and mongodb imageStores doc)
+          await deleteImageStores(threadImageExposedUrl);
         }
 
         // upload new image
@@ -76,8 +96,20 @@ const editThread = async (req, res) => {
           threadImage,
           threadImagePath
         );
-        // set new image to new thread based on update
-        thread.threadImage = newExposedImageUrl;
+        // if null, we need to delete firebase image
+        if (!newExposedImageUrl) {
+          await deleteFirebaseImage(threadImagePath);
+          return res.status(500).json({
+            message: "Error in create thread, create imageStorageUpload",
+          });
+        }
+        // safety catch in case server error goes to catch, we can delete images...
+        else {
+          isImageStorageSuccessful = true;
+          newExposedUrlFailure = newExposedImageUrl;
+          // set new image to new thread based on update
+          thread.threadImage = newExposedImageUrl;
+        }
       } catch (error) {
         console.log("error in firebase delete image call: ", error);
       }
@@ -89,11 +121,20 @@ const editThread = async (req, res) => {
     thread.tags = tags;
 
     await thread.save();
-    const { ...cleanThread } = thread.toObject();
+    isDocUpdateSuccessful = true;
 
-    res.status(200).json(cleanThread);
+    res.status(200).json(thread.toObject());
   } catch (error) {
     console.log("Error in thread Create: ", error);
+    const { threadImagePath } = req.body;
+    // we only need to delete firebase cause imageStore document not created
+    if (!isImageStorageSuccessful) {
+      await deleteFirebaseImage(threadImagePath);
+    }
+    // we need to delete both image stores (firebase and mongodb imageStore document)
+    else if (!isDocUpdateSuccessful) {
+      await deleteImageStores(newExposedUrlFailure);
+    }
     res.status(500).json({ message: "Error in create thread controller" });
   }
 };
