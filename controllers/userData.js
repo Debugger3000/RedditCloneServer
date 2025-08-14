@@ -1,6 +1,6 @@
 import { UserData } from "../models/userData.js";
 import { Thread } from "../models/threads.js";
-import { bucketStorage } from "../middleware/firebase.js";
+import { bucketStorage, getBucket } from "../middleware/firebase.js";
 import { ImageStorage } from "../models/imageUrlStorage.js";
 
 const getUserRecentThreads = async (req, res) => {
@@ -132,7 +132,7 @@ const firebaseUpload = async (req, res) => {
     const fileType = req.query.fileType;
     console.log("file type here: ", fileType);
 
-    const bucket = await bucketStorage();
+    const bucket = await getBucket();
     const file = bucket.file(filePath);
 
     const [url] = await file.getSignedUrl({
@@ -170,7 +170,7 @@ const imageStorageUpload = async (req, res) => {
 
     if (imageDocument && req.user) {
       // get path, set up stream...
-      const bucket = await bucketStorage();
+      const bucket = await getBucket();
       console.log("after bucket awaited in image storage upload");
       const file = bucket.file(imageDocument.imagePath);
 

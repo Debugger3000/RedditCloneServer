@@ -26,6 +26,7 @@ import userDataRouter from "./routes/userData.js";
 // Set environment files based on script start
 dotenv.config({ path: `./.env.${process.env.NODE_ENV}` });
 dotenv.config({ path: "./.env.local" });
+
 // log out environment type
 const environment = process.env.ENVIRONMENT_TYPE;
 console.log("Environment: ", environment);
@@ -50,6 +51,9 @@ app.use((req, res, next) => {
 app.use(
   cors({
     origin: process.env.ORIGIN,
+    // method: ["PUT", "GET", "POST", "PATCH", "DELETE"],
+    // responseHeader: ["Content-type"],
+    // maxAgeSeconds: 3600,
     credentials: true,
   })
 );

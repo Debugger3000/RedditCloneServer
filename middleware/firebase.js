@@ -1,8 +1,45 @@
 // src/firebase-config.ts
-import { initializeApp } from "firebase/app";
-import { getStorage, ref, deleteObject } from "firebase/storage";
+// import { initializeApp } from "firebase/app";
+// import { getStorage, ref, deleteObject } from "firebase/storage";
 import { Storage } from "@google-cloud/storage";
 import { ImageStorage } from "../models/imageUrlStorage.js";
+import { initializeApp, cert } from "firebase-admin/app";
+import { getStorage } from "firebase-admin/storage";
+
+import dotenv from "dotenv";
+dotenv.config({ path: "./.env.local" });
+
+// console.log("private key: ", process.env.FIREBASE_PRIVATE_KEY);
+
+initializeApp({
+  credential: cert({
+    projectId: process.env.FIREBASE_projectId,
+    clientEmail: process.env.FIREBASE_CLIENT_EMAIL,
+    privateKey: process.env.FIREBASE_PRIVATE_KEY.replace(/\\n/g, "\n"),
+  }),
+  storageBucket: process.env.FIREBASE_storageBucket,
+});
+
+// get a bucket with headers set so we can send SIGNED URLS to client
+export async function getBucket() {
+  console.log("CREATING SIGNED URLS...");
+
+  const bucket = getStorage().bucket();
+  await bucket.setCorsConfiguration([
+    {
+      origin: [process.env.ORIGIN],
+      method: ["PUT", "GET", "POST", "HEAD"],
+      responseHeader: ["Content-Type", "x-goog-resumable"],
+      maxAgeSeconds: 3600,
+    },
+  ]);
+  console.log("returning bucket hehe");
+  const [corsConfig] = await bucket.getMetadata();
+  console.log(corsConfig);
+
+  // console.log("bucket signed url: ", bucket);
+  return bucket;
+}
 
 function getFirebaseStorage() {
   const storage = {
@@ -18,13 +55,18 @@ function getFirebaseStorage() {
   return storage;
 }
 
-const app = initializeApp(getFirebaseStorage());
+// admin firebase
+// const app = initializeApp();
 
-export const storage = getStorage(app);
+// const app = initializeApp(getFirebaseStorage());
+
+// export const storage = getStorage(app);
 
 export async function deleteFirebaseImage(path) {
-  const refer = ref(storage, path);
-  await deleteObject(refer);
+  const bucket = getStorage().bucket();
+  await bucket.file(path).delete();
+  // const refer = ref(storage, path);
+  // await deleteObject(refer);
   console.log("delete firebase image at path: ", path);
 }
 
