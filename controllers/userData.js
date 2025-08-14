@@ -153,10 +153,8 @@ const firebaseUpload = async (req, res) => {
       res.status(200).json(null);
     }
   } catch (error) {
-    console.log("Error in get users recent threads: ", error);
-    res
-      .status(500)
-      .json({ message: "Error in get user recent threads controller" });
+    console.log("Error in firebase upload: ", error);
+    res.status(500).json({ message: "Error in firebase upload controller" });
   }
 };
 
