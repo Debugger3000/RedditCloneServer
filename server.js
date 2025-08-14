@@ -73,7 +73,7 @@ const sessionObject = {
 
   cookie: {
     secure: environment === "production",
-    sameSite: environment === "production" ? "none" : "lax",
+    sameSite: "lax",
     httpOnly: true, //lets browser/client access cookie via Document object
     maxAge: 3600000,
   },
