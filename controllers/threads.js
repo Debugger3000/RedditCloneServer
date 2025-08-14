@@ -27,12 +27,10 @@ const createThread = async (req, res) => {
 
       // if null, we need to delete firebase image
       if (!newExposedUrl) {
-        await deleteFirebaseImage(threadImagePath);
-        return res
-          .status(500)
-          .json({
-            message: "Error in create thread, create imageStorageUpload",
-          });
+        // await deleteFirebaseImage(threadImagePath);
+        // return res.status(500).json({
+        //   message: "Error in create thread, create imageStorageUpload",
+        // });
       } else {
         isImageStorageSuccessful = true;
         newExposedUrlFailure = newExposedUrl;
