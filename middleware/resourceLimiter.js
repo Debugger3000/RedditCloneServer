@@ -61,6 +61,9 @@ export async function checkUserIdentityResourceLimiter(req, res, next) {
 
   if (path.includes("vote") || path.includes("join") || method === "GET") {
     console.log("path contains join or vote, so go next. Or path is a GET.");
+    console.log("path of req: ", path);
+    console.log("method of req: ", method);
+
     return next();
   }
 
