@@ -4,7 +4,6 @@ import { deleteObject, ref } from "firebase/storage";
 import {
   deleteFirebaseImage,
   deleteImageStorage,
-  storage,
   imageStorageUpload,
   deleteImageStores,
 } from "../middleware/firebase.js";
