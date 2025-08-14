@@ -42,12 +42,22 @@ const app = express();
 app.use(express.json());
 app.use(cookieParser());
 
+app.use((req, res, next) => {
+  console.log("Before CORS - Origin:", req.headers.origin);
+  next();
+});
+
 app.use(
   cors({
     origin: process.env.ORIGIN,
     credentials: true,
   })
 );
+
+app.use((req, res, next) => {
+  console.log("AFTER CORS - Origin:", req.headers.origin);
+  next();
+});
 
 // set proxy for render to trust cookies being sent
 // if (process.env.ENVIRONMENT_TYPE === "production") {
