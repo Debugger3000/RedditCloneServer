@@ -41,6 +41,7 @@ const app = express();
 // some middle ware for app to use
 app.use(express.json());
 app.use(cookieParser());
+
 app.use(
   cors({
     origin: process.env.ORIGIN,
@@ -49,9 +50,9 @@ app.use(
 );
 
 // set proxy for render to trust cookies being sent
-if (process.env.ENVIRONMENT_TYPE === "production") {
-  app.set("trust proxy", 1);
-}
+// if (process.env.ENVIRONMENT_TYPE === "production") {
+//   app.set("trust proxy", 1);
+// }
 
 // Sessions
 const sessionObject = {
@@ -73,7 +74,7 @@ const sessionObject = {
 
   cookie: {
     secure: environment === "production",
-    sameSite: "lax",
+    sameSite: environment === "production" ? "none" : "lax",
     httpOnly: true, //lets browser/client access cookie via Document object
     maxAge: 3600000,
   },
