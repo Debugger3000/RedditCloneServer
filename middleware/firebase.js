@@ -33,6 +33,8 @@ export async function deleteFirebaseImage(path) {
 export async function imageStorageUpload(imageType, imagePath) {
   // create new image storage model...
   try {
+    console.log("IMAGE STORAGE UPLOADING...");
+
     const imageStorage = new ImageStorage({
       imageType: imageType,
       imagePath: imagePath,
@@ -51,7 +53,7 @@ export async function imageStorageUpload(imageType, imagePath) {
 // delete image storage based on imagePath
 // take exposed url from thread.threadImage, and find document based on that
 export async function deleteImageStorage(imageExposedUrl) {
-  console.log("exposed url given to delte image Storage: ", imageExposedUrl);
+  console.log("exposed url given to DELETE IMAGE STORAGE... ", imageExposedUrl);
   const imageDocument = await ImageStorage.findOneAndDelete({
     exposedUrl: imageExposedUrl,
   });
@@ -85,11 +87,12 @@ export async function deleteImageStores(exposedUrl) {
 // --------------------
 // get a bucket with headers set so we can send SIGNED URLS to client
 export async function bucketStorage() {
+  console.log("CREATING SIGNED URLS...");
   const storage = new Storage({
     projectId: process.env.FIREBASE_PROJECT_ID,
     credentials: {
       client_email: process.env.FIREBASE_CLIENT_EMAIL,
-      private_key: process.env.FIREBASE_PRIVATE_KEY,
+      private_key: process.env.FIREBASE_PRIVATE_KEY.replace(/\\n/g, "\n"),
     },
   });
 
