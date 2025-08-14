@@ -171,24 +171,30 @@ const imageStorageUpload = async (req, res) => {
     if (imageDocument && req.user) {
       // get path, set up stream...
       const bucket = await bucketStorage();
+      console.log("after bucket awaited in image storage upload");
       const file = bucket.file(imageDocument.imagePath);
 
       const [metaData] = await file.getMetadata();
+      console.log("after file.getMetadata()");
       const contentType = metaData.contentType;
 
       res.setHeader("Content-Type", contentType);
 
+      console.log("abefore stream created");
       // Stream the image
       const readStream = file.createReadStream();
+      console.log("after stream created...");
 
       // make sure stream is okay
       readStream.on("error", (err) => {
         console.error("Error streaming image from firebase:", err);
         res.sendStatus(404);
       });
+      console.log("after stream.on...");
 
       // pipe data to the browser from firebase
       readStream.pipe(res);
+      console.log("after stream piped to res...");
     }
 
     // res.status(200).json(url);

@@ -88,16 +88,19 @@ export async function deleteImageStores(exposedUrl) {
 // get a bucket with headers set so we can send SIGNED URLS to client
 export async function bucketStorage() {
   console.log("CREATING SIGNED URLS...");
+
+  const newPrivateKey = process.env.FIREBASE_PRIVATE_KEY.replace(/\\n/g, "\n");
   const storage = new Storage({
     projectId: process.env.FIREBASE_PROJECT_ID,
     credentials: {
       client_email: process.env.FIREBASE_CLIENT_EMAIL,
-      private_key: process.env.FIREBASE_PRIVATE_KEY.replace(/\\n/g, "\n"),
+      private_key: newPrivateKey,
     },
   });
 
+  console.log("after storage created...");
   const bucket = storage.bucket(process.env.FIREBASE_storageBucket);
-
+  console.log("after bucket created...");
   // set meta data for firebase bucket here...
   await bucket.setMetadata({
     cors: [
@@ -109,6 +112,7 @@ export async function bucketStorage() {
       },
     ],
   });
+  console.log("after after metadata set for bucket... pre return");
 
   // console.log(":cors bucker now: ", bucket);
 
