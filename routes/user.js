@@ -22,9 +22,6 @@ import {
 
 // routes for /user to hit
 router.get("/", usersGet);
-router.get("/:id", userGet);
-
-router.post("/edit-profile/:id", editProfile);
 
 router.post("/login", userLogin);
 router.post("/register", userRegister);
@@ -47,6 +44,10 @@ router.get("/auth/github", passport.authenticate("github"));
 
 // check if user auth
 router.post("/isAuth", isAuthenticated);
+
+// dynamic routes at bottom
+router.post("/edit-profile/:id", editProfile);
+router.get("/:id", userGet);
 
 export default router;
 // module.exports = router;

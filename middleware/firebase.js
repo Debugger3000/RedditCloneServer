@@ -9,7 +9,7 @@ import { getStorage } from "firebase-admin/storage";
 import dotenv from "dotenv";
 dotenv.config({ path: "./.env.local" });
 
-// console.log("private key: ", process.env.FIREBASE_PRIVATE_KEY);
+console.log("private key: ", process.env.FIREBASE_PRIVATE_KEY);
 
 initializeApp({
   credential: cert({
