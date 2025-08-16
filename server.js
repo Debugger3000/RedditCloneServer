@@ -43,13 +43,13 @@ const app = express();
 app.use(express.json());
 app.use(cookieParser());
 
-app.use((req, res, next) => {
-  console.log("Before CORS - Origin:", req.headers.origin);
-  console.log("print req headers on requests cookies: ", req.cookies);
-  console.log("req object: ", req);
+// app.use((req, res, next) => {
+//   console.log("Before CORS - Origin:", req.headers.origin);
+//   // console.log("print req headers on requests cookies: ", req.cookies);
+//   // console.log("req object: ", req);
 
-  next();
-});
+//   next();
+// });
 
 app.use(
   cors({
@@ -61,11 +61,11 @@ app.use(
   })
 );
 
-app.use((req, res, next) => {
-  console.log("AFTER CORS - Origin:", req.headers.origin);
-  console.log("req object AFTER cors.use(): ", req);
-  next();
-});
+// app.use((req, res, next) => {
+//   console.log("AFTER CORS - Origin:", req.headers.origin);
+//   // console.log("req object AFTER cors.use(): ", req);
+//   next();
+// });
 
 // set proxy for render to trust cookies being sent
 // if (process.env.ENVIRONMENT_TYPE === "production") {
@@ -100,7 +100,7 @@ const sessionObject = {
   // },
 
   cookie: {
-    domain: process.env.COOKIE_DOMAIN,
+    domain: ".carter-rutherford.com",
     secure: true,
     sameSite: "none",
     httpOnly: true, //lets browser/client access cookie via Document object
