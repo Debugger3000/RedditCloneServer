@@ -87,7 +87,8 @@ const sessionObject = {
   //  secure: process.env.ENVIRONMENT_TYPE === "production",
 
   cookie: {
-    domain: process.env.COOKIE_DOMAIN,
+    domain:
+      environment === "production" ? process.env.COOKIE_DOMAIN : undefined,
     secure: environment === "production",
     sameSite: environment === "production" ? "none" : "lax",
     httpOnly: true, //lets browser/client access cookie via Document object
