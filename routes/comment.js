@@ -16,10 +16,12 @@ import {
 // Post a new thread to collection
 router.post("/", createComment);
 router.get("/", getComments);
-router.get("/:id", getCommentsByPost);
+
 router.post("/vote", commentVote);
-router.delete("/:id", deleteComment);
 // id given by req body for some reason lol
 router.put("/", editComment);
+
+router.get("/:id", getCommentsByPost);
+router.delete("/:id", deleteComment);
 
 export default router;
