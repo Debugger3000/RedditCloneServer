@@ -9,13 +9,16 @@ import { getStorage } from "firebase-admin/storage";
 import dotenv from "dotenv";
 dotenv.config({ path: "./.env.local" });
 
-console.log("private key: ", process.env.FIREBASE_PRIVATE_KEY);
+console.log("BEFORE private key: ", process.env.FIREBASE_PRIVATE_KEY);
+const key = process.env.FIREBASE_PRIVATE_KEY.replace(/\\n/g, "\n");
+console.log("After private key: ", key);
+console.log("After private key: ", key.split("\n"));
 
 initializeApp({
   credential: cert({
     projectId: process.env.FIREBASE_projectId,
     clientEmail: process.env.FIREBASE_CLIENT_EMAIL,
-    privateKey: process.env.FIREBASE_PRIVATE_KEY.replace(/\n/g, "\n"),
+    privateKey: process.env.FIREBASE_PRIVATE_KEY.replace(/\\n/g, "\n"),
   }),
   storageBucket: process.env.FIREBASE_storageBucket,
 });
