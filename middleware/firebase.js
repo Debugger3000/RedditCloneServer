@@ -18,7 +18,7 @@ initializeApp({
   credential: cert({
     projectId: process.env.FIREBASE_projectId,
     clientEmail: process.env.FIREBASE_CLIENT_EMAIL,
-    privateKey: process.env.FIREBASE_PRIVATE_KEY.replace(/\\n/g, "\n"),
+    privateKey: key,
   }),
   storageBucket: process.env.FIREBASE_storageBucket,
 });
