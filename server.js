@@ -45,6 +45,9 @@ app.use(cookieParser());
 
 app.use((req, res, next) => {
   console.log("Before CORS - Origin:", req.headers.origin);
+  console.log("print req headers on requests cookies: ", req.cookies);
+  console.log("req object: ", req);
+
   next();
 });
 
@@ -60,6 +63,7 @@ app.use(
 
 app.use((req, res, next) => {
   console.log("AFTER CORS - Origin:", req.headers.origin);
+  console.log("req object AFTER cors.use(): ", req);
   next();
 });
 
@@ -86,11 +90,19 @@ const sessionObject = {
   // partitioned: true,
   //  secure: process.env.ENVIRONMENT_TYPE === "production",
 
+  // cookie: {
+  //   domain:
+  //     environment === "production" ? process.env.COOKIE_DOMAIN : undefined,
+  //   secure: environment === "production",
+  //   sameSite: environment === "production" ? "none" : "lax",
+  //   httpOnly: true, //lets browser/client access cookie via Document object
+  //   maxAge: 3600000,
+  // },
+
   cookie: {
-    domain:
-      environment === "production" ? process.env.COOKIE_DOMAIN : undefined,
-    secure: environment === "production",
-    sameSite: environment === "production" ? "none" : "lax",
+    domain: process.env.COOKIE_DOMAIN,
+    secure: true,
+    sameSite: "none",
     httpOnly: true, //lets browser/client access cookie via Document object
     maxAge: 3600000,
   },
