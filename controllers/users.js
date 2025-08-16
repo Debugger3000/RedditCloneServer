@@ -124,7 +124,7 @@ const userLogin = function (req, res, next) {
 
           req.session.save(() => {
             console.log("Session saved:", req.sessionID);
-            console.log("req cookies: ", req);
+            // console.log("req cookies: ", req);
             res.status(200).json({
               status: true,
               username: user.username,
