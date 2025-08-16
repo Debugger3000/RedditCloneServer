@@ -59,12 +59,16 @@ export async function checkUserIdentityResourceLimiter(req, res, next) {
   const path = req.path;
   const method = req.method;
 
+  if (!req.user) {
+    next();
+  }
+
   if (path.includes("vote") || path.includes("join") || method === "GET") {
     console.log("path contains join or vote, so go next. Or path is a GET.");
     console.log("path of req: ", path);
     console.log("method of req: ", method);
 
-    return next();
+    next();
   }
 
   // check for string match in our path object
@@ -87,7 +91,7 @@ export async function checkUserIdentityResourceLimiter(req, res, next) {
     console.log("test user: ", testUser);
     // if TestUser is null or empty, then we need to go next
     if (!testUser) {
-      return next();
+      next();
     }
 
     // check if its a new day, to reset all the values to zero before trying to increment or check values
@@ -116,11 +120,11 @@ export async function checkUserIdentityResourceLimiter(req, res, next) {
     } else if (!result.status) {
       return res.status(500).json();
     } else {
-      return next();
+      next();
     }
   } else {
     // user checks out, pass control to router...
-    return next();
+    next();
   }
 }
 
