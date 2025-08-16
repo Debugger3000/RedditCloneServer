@@ -102,9 +102,9 @@ const sessionObject = {
   // },
 
   cookie: {
-    domain: ".carter-rutherford.com",
-    secure: true,
-    sameSite: "none",
+    // domain: ".carter-rutherford.com",
+    // secure: true,
+    // sameSite: "none",
     httpOnly: true, //lets browser/client access cookie via Document object
     maxAge: 3600000,
   },
