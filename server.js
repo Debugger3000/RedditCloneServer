@@ -63,11 +63,12 @@ app.use(
   })
 );
 
-// app.use((req, res, next) => {
-//   console.log("AFTER CORS - Origin:", req.headers.origin);
-//   // console.log("req object AFTER cors.use(): ", req);
-//   next();
-// });
+app.use((req, res, next) => {
+  console.log("Incoming request path:", req.path);
+  console.log("Incoming request originalUrl:", req.originalUrl);
+  // console.log("req object AFTER cors.use(): ", req);
+  next();
+});
 
 // set proxy for render to trust cookies being sent
 // if (process.env.ENVIRONMENT_TYPE === "production") {
