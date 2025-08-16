@@ -39,6 +39,8 @@ const port = 8080;
 // initialize base of express app
 const app = express();
 
+// app.set("trust proxy", 3);
+
 // some middle ware for app to use
 app.use(express.json());
 app.use(cookieParser());

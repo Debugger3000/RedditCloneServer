@@ -122,27 +122,14 @@ const userLogin = function (req, res, next) {
           console.log("User logged in !");
           console.log("Is User Authenticated: ", req.isAuthenticated());
 
-          req.session.save(() => {
-            console.log("Session saved:", req.sessionID);
-            // console.log("req cookies: ", req);
-            res.status(200).json({
-              status: true,
-              username: user.username,
-              _id: user._id,
-              profileImage: user.profileImage,
-              votes: user.votes,
-              voteOnComments: user.voteOnComments,
-            });
+          res.status(200).json({
+            status: true,
+            username: user.username,
+            _id: user._id,
+            profileImage: user.profileImage,
+            votes: user.votes,
+            voteOnComments: user.voteOnComments,
           });
-
-          // res.status(200).json({
-          //   status: true,
-          //   username: user.username,
-          //   _id: user._id,
-          //   profileImage: user.profileImage,
-          //   votes: user.votes,
-          //   voteOnComments: user.voteOnComments,
-          // });
         });
       }
     } catch (error) {
