@@ -8,13 +8,13 @@ import {
   getUserRecentThreads,
   updateRecentThreads,
   firebaseUpload,
-  imageStorageUpload,
+  getFirebaseImage,
 } from "../controllers/userData.js";
 
 // Post a new thread to collection
 router.get("/recentThreads", getUserRecentThreads);
 router.patch("/recentThreads", updateRecentThreads);
 router.get("/firebase/upload", firebaseUpload);
-router.get("/images/get/:id", imageStorageUpload);
+router.get("/images/get/:id", getFirebaseImage);
 
 export default router;

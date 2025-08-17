@@ -37,8 +37,8 @@ export async function getBucket() {
     },
   ]);
   console.log("returning bucket hehe");
-  const [corsConfig] = await bucket.getMetadata();
-  console.log(corsConfig);
+  // const [corsConfig] = await bucket.getMetadata();
+  // console.log(corsConfig);
 
   // console.log("bucket signed url: ", bucket);
   return bucket;
