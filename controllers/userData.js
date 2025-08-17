@@ -1,6 +1,6 @@
 import { UserData } from "../models/userData.js";
 import { Thread } from "../models/threads.js";
-import { bucketStorage, getBucket } from "../middleware/firebase.js";
+import { bucket } from "../middleware/firebase.js";
 import { ImageStorage } from "../models/imageUrlStorage.js";
 
 const getUserRecentThreads = async (req, res) => {
@@ -132,8 +132,8 @@ const firebaseUpload = async (req, res) => {
     const fileType = req.query.fileType;
     console.log("file type here: ", fileType);
 
-    const bucket = await getBucket();
-    const file = bucket.file(filePath);
+    const uploadBucket = bucket;
+    const file = uploadBucket.file(filePath);
 
     const [url] = await file.getSignedUrl({
       version: "v4",
@@ -158,46 +158,22 @@ const firebaseUpload = async (req, res) => {
   }
 };
 
+// -----------------------------------
+// image queue workers
+
+let queue = [];
+let activeWorkers = 0;
+const MAX_WORKERS = 2;
+
 // Access point for all images on web app.
 // Stream image data from firebase to client res object from here
 const getFirebaseImage = async (req, res) => {
   console.log("getting image from secure storage route hit");
   try {
     const id = req.params.id;
-
-    // search for image document
-    const imageDocument = await ImageStorage.findById(id);
-
-    if (imageDocument && req.user) {
-      // get path, set up stream...
-      const bucket = await getBucket();
-      console.log("after bucket awaited in image storage upload");
-      const file = bucket.file(imageDocument.imagePath);
-
-      const [metaData] = await file.getMetadata();
-      console.log("after file.getMetadata()");
-      const contentType = metaData.contentType;
-
-      res.setHeader("Content-Type", contentType);
-
-      console.log("abefore stream created");
-      // Stream the image
-      const readStream = file.createReadStream();
-      console.log("after stream created...");
-
-      // make sure stream is okay
-      readStream.on("error", (err) => {
-        console.error("Error streaming image from firebase:", err);
-        res.sendStatus(404);
-      });
-      console.log("after stream.on...");
-
-      // pipe data to the browser from firebase
-      readStream.pipe(res);
-      console.log("after stream piped to res...");
-    }
-
-    // res.status(200).json(url);
+    queue.push({ id, res });
+    // run queue function
+    processQueue();
   } catch (error) {
     console.log("Error in get image from storage / firebase...", error);
     res
@@ -205,6 +181,74 @@ const getFirebaseImage = async (req, res) => {
       .json({ message: "Error in get image from storage / firebase..." });
   }
 };
+
+async function processQueue() {
+  console.log("Process queue called, and running: ", queue.length);
+
+  try {
+    if (activeWorkers >= MAX_WORKERS) {
+      return;
+    }
+
+    const job = queue.shift();
+    if (!job) return;
+
+    activeWorkers++;
+
+    const { id, res } = job;
+
+    // search for image document
+    const imageDocument = await ImageStorage.findById(id);
+
+    if (imageDocument) {
+      // get path, set up stream...
+      const bucketQ = bucket;
+      console.log("after bucket awaited in image storage upload");
+
+      const file = bucketQ.file(imageDocument.imagePath);
+      const [metaData] = await file.getMetadata();
+
+      console.log("after file.getMetadata()");
+
+      const contentType = metaData.contentType;
+      res.setHeader("Content-Type", contentType);
+
+      console.log("Before stream created");
+
+      // Stream the image
+      const readStream = file.createReadStream();
+      console.log("after stream created...");
+
+      // pipe data to the browser from firebase
+      readStream.pipe(res);
+      console.log("after stream piped to res...");
+
+      // make sure stream is okay
+      readStream.on("error", (err) => {
+        activeWorkers--;
+        console.error("Error streaming image from firebase:", err);
+        res.status(500);
+        processQueue();
+      });
+      console.log("after stream.on...");
+
+      // when stream ends
+      readStream.on("end", () => {
+        activeWorkers--;
+        processQueue();
+      });
+
+      // if somehow, we reach here, just return 500
+      res.status(500);
+    }
+    // imageStorage document not found, so we just return and fail silently
+    else {
+      return;
+    }
+  } catch (error) {
+    console.log("Error in processQueue for Workers in image streaming", error);
+  }
+}
 
 export {
   getUserRecentThreads,

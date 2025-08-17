@@ -9,10 +9,10 @@ import { getStorage } from "firebase-admin/storage";
 import dotenv from "dotenv";
 dotenv.config({ path: "./.env.local" });
 
-console.log("BEFORE private key: ", process.env.FIREBASE_PRIVATE_KEY);
+// console.log("BEFORE private key: ", process.env.FIREBASE_PRIVATE_KEY);
 const key = process.env.FIREBASE_PRIVATE_KEY.replace(/\\n/g, "\n");
-console.log("After private key: ", key);
-console.log("After private key: ", key.split("\n"));
+// console.log("After private key: ", key);
+// console.log("After private key: ", key.split("\n"));
 
 initializeApp({
   credential: cert({
@@ -23,11 +23,16 @@ initializeApp({
   storageBucket: process.env.FIREBASE_storageBucket,
 });
 
+export const bucket = getStorage().bucket();
+
+// run once on load, and give bucket its cors
+setBucketCors();
+
 // get a bucket with headers set so we can send SIGNED URLS to client
-export async function getBucket() {
+async function setBucketCors() {
   console.log("CREATING SIGNED URLS...");
 
-  const bucket = getStorage().bucket();
+  // const bucket = getStorage().bucket();
   await bucket.setCorsConfiguration([
     {
       origin: [process.env.ORIGIN],
@@ -37,26 +42,23 @@ export async function getBucket() {
     },
   ]);
   console.log("returning bucket hehe");
-  // const [corsConfig] = await bucket.getMetadata();
-  // console.log(corsConfig);
 
-  // console.log("bucket signed url: ", bucket);
-  return bucket;
+  // return bucket;
 }
 
-function getFirebaseStorage() {
-  const storage = {
-    apiKey: process.env.FIREBASE_APIKEY,
-    authDomain: process.env.FIREBASE_authDomain,
-    projectId: process.env.FIREBASE_projectId,
-    storageBucket: process.env.FIREBASE_storageBucket,
-    messagingSenderId: process.env.FIREBASE_messagingSenderId,
-    appId: process.env.FIREBASE_appId,
-    measurementId: process.env.FIREBASE_measurementId,
-  };
-  // console.log("storage item used for firebase delete: ", storage);
-  return storage;
-}
+// function getFirebaseStorage() {
+//   const storage = {
+//     apiKey: process.env.FIREBASE_APIKEY,
+//     authDomain: process.env.FIREBASE_authDomain,
+//     projectId: process.env.FIREBASE_projectId,
+//     storageBucket: process.env.FIREBASE_storageBucket,
+//     messagingSenderId: process.env.FIREBASE_messagingSenderId,
+//     appId: process.env.FIREBASE_appId,
+//     measurementId: process.env.FIREBASE_measurementId,
+//   };
+//   // console.log("storage item used for firebase delete: ", storage);
+//   return storage;
+// }
 
 // admin firebase
 // const app = initializeApp();
@@ -131,35 +133,35 @@ export async function deleteImageStores(exposedUrl) {
 
 // --------------------
 // get a bucket with headers set so we can send SIGNED URLS to client
-export async function bucketStorage() {
-  console.log("CREATING SIGNED URLS...");
+// export async function bucketStorage() {
+//   console.log("CREATING SIGNED URLS...");
 
-  const newPrivateKey = process.env.FIREBASE_PRIVATE_KEY.replace(/\\n/g, "\n");
-  const storage = new Storage({
-    projectId: process.env.FIREBASE_PROJECT_ID,
-    credentials: {
-      client_email: process.env.FIREBASE_CLIENT_EMAIL,
-      private_key: newPrivateKey,
-    },
-  });
+//   const newPrivateKey = process.env.FIREBASE_PRIVATE_KEY.replace(/\\n/g, "\n");
+//   const storage = new Storage({
+//     projectId: process.env.FIREBASE_PROJECT_ID,
+//     credentials: {
+//       client_email: process.env.FIREBASE_CLIENT_EMAIL,
+//       private_key: newPrivateKey,
+//     },
+//   });
 
-  console.log("after storage created...");
-  const bucket = storage.bucket(process.env.FIREBASE_storageBucket);
-  console.log("after bucket created...");
-  // set meta data for firebase bucket here...
-  await bucket.setMetadata({
-    cors: [
-      {
-        origin: [process.env.ORIGIN],
-        method: ["PUT"],
-        responseHeader: ["Content-Type"],
-        maxAgeSeconds: 3600,
-      },
-    ],
-  });
-  console.log("after after metadata set for bucket... pre return");
+//   console.log("after storage created...");
+//   const bucket = storage.bucket(process.env.FIREBASE_storageBucket);
+//   console.log("after bucket created...");
+//   // set meta data for firebase bucket here...
+//   await bucket.setMetadata({
+//     cors: [
+//       {
+//         origin: [process.env.ORIGIN],
+//         method: ["PUT"],
+//         responseHeader: ["Content-Type"],
+//         maxAgeSeconds: 3600,
+//       },
+//     ],
+//   });
+//   console.log("after after metadata set for bucket... pre return");
 
-  // console.log(":cors bucker now: ", bucket);
+//   // console.log(":cors bucker now: ", bucket);
 
-  return bucket;
-}
+//   return bucket;
+// }
