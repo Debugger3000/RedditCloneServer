@@ -4,7 +4,7 @@ import {
 } from "../middleware/hydration/postHydration.js";
 import { Post } from "../models/posts.js";
 import { User } from "../models/users.js";
-import { getCacheData, setCacheData, client } from "../middleware/redis.js";
+// import { getCacheData, setCacheData, client } from "../middleware/redis.js";
 
 const createPost = async (req, res) => {
   console.log("Create Post route hit");
@@ -80,10 +80,10 @@ const getPosts = async (req, res) => {
     // console.log("feedStype: ", feedType);
 
     // cache key based on pagination page and feedType
-    const redisKey = `home:${page}:${feedType}`;
+    //const redisKey = `home:${page}:${feedType}`;
 
     // check cache for data first before any DB calls
-    const cached = await getCacheData(redisKey);
+    //const cached = await getCacheData(redisKey);
     // console.log("returned cached data before IF: ", cached);
     // console.log("length of cached: ", cached.length);
 
@@ -109,7 +109,7 @@ const getPosts = async (req, res) => {
         .sort({ createdAt: sortVal });
 
       // set cache data for posts return
-      const cachedData = await setCacheData(redisKey, posts);
+      //const cachedData = await setCacheData(redisKey, posts);
       // console.log("We grabbed from DB, and set Cached data", cachedData);
 
       // const keys = await client.keys("*"); // be cautious with this on large DBs
