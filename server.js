@@ -34,7 +34,6 @@ console.log("evnrionment strict var: ", environment);
 console.log("origin: ", process.env.ORIGIN);
 
 // general variables
-const port = 8080;
 
 // initialize base of express app
 const app = express();
@@ -151,7 +150,7 @@ app.use("/api/userData", userDataRouter);
 // app.use('/auth', githubRouter);
 
 // listen to a port
-app.listen(port, () => {
+app.listen(process.env.PORT, () => {
   console.log("Listening on port 8080");
 });
 
