@@ -216,7 +216,7 @@ const editProfile = async (req, res) => {
   } catch (error) {
     // If data didnt persist onto user profile, then we delete firebase / mongo image records...
     if (!isImageStorageSuccessful) {
-      await deleteFirebaseImage(threadImagePath);
+      await deleteFirebaseImage(newExposedUrlFailure);
     }
     // we need to delete both image stores (firebase and mongodb imageStore document)
     else if (!isDocUpdateSuccessful) {

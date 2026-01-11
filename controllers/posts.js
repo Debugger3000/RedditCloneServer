@@ -88,10 +88,8 @@ const getPosts = async (req, res) => {
     // console.log("length of cached: ", cached.length);
 
     //
-    if (cached && cached.length == limit) {
-      console.log("We grabbed cached data !");
-      res.status(200).json(cached);
-    } else {
+    
+    
       // -1 by default so always grabbing latest...
       let sortVal = -1;
       if (feedType === "oldest") {
@@ -118,7 +116,7 @@ const getPosts = async (req, res) => {
       // console.log("posts length: ", posts.length);
 
       res.status(200).json(posts);
-    }
+    
   } catch (error) {
     console.log("Error in post GET ALL POSTS: ", error);
     res.status(500).json({ message: "Error in create post controller" });
